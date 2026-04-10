@@ -153,6 +153,18 @@ const BIPCalculator: React.FC = () => {
     ww1: '600',
     ww2: '700',
   });
+  const [recoveries, setRecoveries] = useState<Record<string, string>>({
+    leg1: '95',
+    leg1min: '1',
+    leg2: '90',
+    leg2min: '1',
+    mbt: '92',
+    maltodextrin: '85',
+    wort: '88',
+    ww1: '80',
+    ww2: '82',
+    wortFTQ: '1',
+  });
 
   const totalBIP = useMemo(() => {
     return Object.keys(results).reduce((sum, rowId) => {
@@ -214,6 +226,23 @@ const BIPCalculator: React.FC = () => {
         value={volumes[volumeKey] || ''}
         onChange={(event) => handleVolumeChange(volumeKey, event.target.value)}
         className="w-full text-center rounded border border-slate-300 bg-white px-1 py-1 text-xs text-slate-900 outline-none transition focus:border-slate-400"
+        placeholder="Enter"
+      />
+    );
+  };
+
+  const handleRecoveryChange = (rowId: string, value: string) => {
+    setRecoveries((prev) => ({ ...prev, [rowId]: value }));
+  };
+
+  const renderRecoveryInput = (rowId: string) => {
+    return (
+      <input
+        type="number"
+        step="any"
+        value={recoveries[rowId] || ''}
+        onChange={(event) => handleRecoveryChange(rowId, event.target.value)}
+        className="w-full text-center rounded border border-slate-300 bg-amber-100 px-1 py-1 text-xs text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-amber-200"
         placeholder="Enter"
       />
     );
@@ -358,7 +387,7 @@ const BIPCalculator: React.FC = () => {
                       <td className="border border-slate-200 px-2 py-2 text-center">
                         {row.volume ? renderVolumeInput(row.id) : '-'}
                       </td>
-                      <td className="border border-slate-200 px-2 py-2 text-center text-slate-900">{row.recovery || row.recoveryFactor || '-'}</td>
+                      <td className="border border-slate-200 px-2 py-2 text-center">{renderRecoveryInput(row.id)}</td>
                       <td className="border border-slate-200 px-4 py-2 text-center font-semibold text-slate-900 w-24">{results[row.id] ?? '-'}</td>
                     </tr>
                   ))}
