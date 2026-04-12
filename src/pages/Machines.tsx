@@ -33,7 +33,7 @@ const Machines: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('main');
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* ── Page header (same style as before) ── */}
       <div className="mb-5">
         <h2 className="text-xl font-bold text-slate-900">
@@ -45,14 +45,14 @@ const Machines: React.FC = () => {
       </div>
 
       {/* ── Sub-tabs (same visual style as before) ── */}
-      <div className="flex gap-0 bg-white border border-slate-300 rounded-lg overflow-hidden mb-5 w-fit">
+      <div className="mb-5 flex w-fit flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-5 py-3 text-sm font-medium transition-colors border-r border-slate-300 last:border-r-0 ${
+            className={`rounded-xl px-5 py-3 text-sm font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-slate-900 text-white font-semibold'
+                ? 'bg-slate-900 text-white shadow-sm'
                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
@@ -62,10 +62,10 @@ const Machines: React.FC = () => {
       </div>
 
       {/* ── Card wrapper (same Card + StatusBadge pattern as before) ── */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-6 overflow-hidden">
+      <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
         {/* Card header */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-5 py-4 border-b border-slate-200">
+        <div className="flex flex-col gap-4 border-b border-slate-200 bg-slate-50/70 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h3 className="text-base font-semibold text-slate-900">
               {TABS.find(t => t.id === activeTab)?.label}
@@ -79,13 +79,8 @@ const Machines: React.FC = () => {
         </div>
 
         {/* ── SVG flowchart area (replaces the old <img> tag) ── */}
-        {/*
-          The SVGs are dark-themed internally (deep navy background).
-          The surrounding card stays white to match your existing UI.
-          overflow-x-auto handles very wide diagrams on small screens.
-        */}
-        <div className="overflow-x-auto bg-[#020b18] rounded-b-xl">
-          <div className="min-w-[900px]">
+        <div className="overflow-x-auto bg-gradient-to-b from-slate-50 via-white to-slate-50 px-3 py-4 sm:px-4 lg:px-6">
+          <div className="min-w-[980px]">
             {activeTab === 'main'    && <CompleteProcess />}
             {activeTab === 'solid'   && <SolidHandling />}
             {activeTab === 'mashing' && <MashingSection />}

@@ -40,38 +40,10 @@ function sc(actual: number, target: number, tol = 0.05): Clr {
   return               { stroke: "#dc2626", fill: "#fef2f2", text: "#b91c1c" };
 }
 
-const BLUE:   Clr = { stroke: "#3b82f6", fill: "#eff6ff", text: "#1d4ed8" };
-const PURPLE: Clr = { stroke: "#7c3aed", fill: "#f5f3ff", text: "#6d28d9" };
-const SKY:    Clr = { stroke: "#0284c7", fill: "#f0f9ff", text: "#0369a1" };
-
-function Badge({ x, y, w = 136, h = 44, label, value, unit = "", c }: {
-  x: number; y: number; w?: number; h?: number;
-  label: string; value: string; unit?: string; c: Clr;
-}) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={6}
-        fill={c.fill} stroke={c.stroke} strokeWidth={1.2} />
-      <text x={x + w / 2} y={y + 14} textAnchor="middle"
-        fontSize={9} fill="#6b7280" fontFamily="sans-serif" fontWeight="500" letterSpacing="0.04em">
-        {label}
-      </text>
-      <text x={x + w / 2} y={y + 32} textAnchor="middle"
-        fontSize={13} fontWeight="700" fill={c.text}
-        fontFamily="'IBM Plex Mono','Courier New',monospace">
-        {value}
-        {unit && <tspan fontSize={9} fill={c.stroke}> {unit}</tspan>}
-      </text>
-    </g>
-  );
-}
-
+// ─── Silo ─────────────────────────────────────────────────────────────────────
 function Silo({ x, y, label, sub }: { x: number; y: number; label: string; sub?: string }) {
   return (
     <g>
-      <polygon points={`${x + 38},${y - 14} ${x + 30},${y - 2} ${x + 46},${y - 2}`}
-        fill="none" stroke="#94a3b8" strokeWidth={1} />
-      <text x={x + 38} y={y - 5} textAnchor="middle" fontSize={7} fill="#94a3b8">!</text>
       <ellipse cx={x + 38} cy={y + 6} rx={38} ry={7} fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x} y={y + 6} width={76} height={62} fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x + 60} y={y + 6} width={16} height={62} fill="#e2e8f0" />
@@ -87,34 +59,35 @@ function Silo({ x, y, label, sub }: { x: number; y: number; label: string; sub?:
   );
 }
 
+// ─── Mill ─────────────────────────────────────────────────────────────────────
 function Mill({ x, y }: { x: number; y: number }) {
   return (
     <g>
       <rect x={x} y={y} width={66} height={46} rx={5} fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x + 50} y={y} width={16} height={46} rx={4} fill="#e2e8f0" />
       <ellipse cx={x + 21} cy={y + 23} rx={13} ry={13} fill="#dbeafe" stroke="#3b82f6" strokeWidth={1.2} />
-      <ellipse cx={x + 21} cy={y + 23} rx={5} ry={5} fill="#3b82f6" />
+      <ellipse cx={x + 21} cy={y + 23} rx={5}  ry={5}  fill="#3b82f6" />
       <ellipse cx={x + 41} cy={y + 23} rx={13} ry={13} fill="#dbeafe" stroke="#3b82f6" strokeWidth={1.2} />
-      <ellipse cx={x + 41} cy={y + 23} rx={5} ry={5} fill="#3b82f6" />
+      <ellipse cx={x + 41} cy={y + 23} rx={5}  ry={5}  fill="#3b82f6" />
       <polygon points={`${x + 18},${y + 46} ${x + 46},${y + 46} ${x + 40},${y + 64} ${x + 24},${y + 64}`}
         fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1} />
     </g>
   );
 }
 
-function Hopper({ x, y, label }: { x: number; y: number; label?: string }) {
+// ─── Hopper ───────────────────────────────────────────────────────────────────
+function Hopper({ x, y }: { x: number; y: number }) {
   return (
     <g>
       <polygon points={`${x},${y} ${x + 54},${y} ${x + 40},${y + 44} ${x + 14},${y + 44}`}
         fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1.2} />
       <polygon points={`${x + 40},${y} ${x + 54},${y} ${x + 40},${y + 44}`}
         fill="#e2e8f0" />
-      {label && <text x={x + 27} y={y + 22} textAnchor="middle"
-        fontSize={8} fill="#64748b" fontFamily="sans-serif">{label}</text>}
     </g>
   );
 }
 
+// ─── Screw Conveyor ───────────────────────────────────────────────────────────
 function ScrewConveyor({ x, y, w }: { x: number; y: number; w: number }) {
   const n = Math.floor(w / 22);
   return (
@@ -135,6 +108,7 @@ function ScrewConveyor({ x, y, w }: { x: number; y: number; w: number }) {
   );
 }
 
+// ─── Mixing Tank ──────────────────────────────────────────────────────────────
 function MixingTank({ x, y, level }: { x: number; y: number; level: number }) {
   const H = 110, W = 90, cx = x + W / 2;
   const fillH = Math.max(4, (level / 100) * (H - 18));
@@ -143,7 +117,7 @@ function MixingTank({ x, y, level }: { x: number; y: number; level: number }) {
   return (
     <g>
       <line x1={cx - 16} y1={y - 30} x2={cx - 16} y2={y}
-        stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSHmain)" />
+        stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSH)" />
       <ellipse cx={cx} cy={y} rx={W / 2} ry={9} fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x} y={y} width={W} height={H} fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x + 1} y={y + H - fillH} width={W - 2} height={fillH} fill={fc} opacity={0.6} />
@@ -159,11 +133,12 @@ function MixingTank({ x, y, level }: { x: number; y: number; level: number }) {
           stroke="#94a3b8" strokeWidth={2.5} />
       ))}
       <line x1={x + W + 12} y1={y + H / 2 + 10} x2={x + W + 36} y2={y + H / 2 + 10}
-        stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowSHmain)" />
+        stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowSH)" />
     </g>
   );
 }
 
+// ─── Main component ───────────────────────────────────────────────────────────
 const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData }) => {
   const [d, setD] = useState(data);
   const iv = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -182,7 +157,7 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         mixing_tank_level: Math.round(50 + Math.random() * 35),
         mixing_flow_rate:  Math.round(9200 + Math.random() * 800),
         mixing_pct_ts:     parseFloat((13.5 + Math.random() * 2.5).toFixed(1)),
-        output_wastage_pct:parseFloat((0.8 + Math.random() * 3.5).toFixed(2)),
+        output_wastage_pct: parseFloat((0.8 + Math.random() * 3.5).toFixed(2)),
         output_actual_kg:  Math.round(27000 + Math.random() * 1200),
       }));
     }, 2500);
@@ -193,145 +168,176 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
   const wfC = sc(d.wf_actual_flow, d.wf_target_flow);
   const mbC = sc(d.mb_actual_flow, d.mb_target_flow);
   const flC = sc(d.mixing_flow_rate, d.mixing_flow_target);
-  const waC = d.output_wastage_pct > 4
+  const waC: Clr = d.output_wastage_pct > 4
     ? { stroke: "#dc2626", fill: "#fef2f2", text: "#b91c1c" }
     : d.output_wastage_pct > 1
     ? { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" }
     : { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" };
 
-  // layout constants
-  const SY = 48;   // silo y
-  const PY = 420;  // conveyor y
-  const TX = 692;  // mixing tank x
+  // ── Layout constants ─────────────────────────────────────────────────────────
+  const SY = 52;       // silo top y
+  const convX = 50;    // conveyor left x
+  const convY = 412;   // conveyor top y
+  const convW = 390;   // conveyor width
+  const TX = 596;      // mixing tank x
+  const tankY = 260;   // mixing tank y
+
+  // Silo center x values
+  const wgCX = 96,  wfCX = 236, mbCX = 376;
 
   return (
-    <div style={{ background: "#ffffff", padding: "16px 16px 0", borderRadius: 8 }}>
-      <svg width="100%" viewBox="0 0 1040 640" fontFamily="'Inter','Segoe UI',sans-serif">
+    <div style={{ background: "#ffffff", padding: "16px 0 8px", borderRadius: 18 }}>
+      <svg width="100%" viewBox="0 0 1040 600" fontFamily="'IBM Plex Mono', monospace">
         <defs>
-          <marker id="arrowSHmain" viewBox="0 0 10 10" refX="8" refY="5"
+          <marker id="arrowSH" viewBox="0 0 10 10" refX="8" refY="5"
             markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M2 2L8 5L2 8" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
           </marker>
-          <marker id="arrowGSHmain" viewBox="0 0 10 10" refX="8" refY="5"
+          <marker id="arrowGSH" viewBox="0 0 10 10" refX="8" refY="5"
             markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M2 2L8 5L2 8" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
           </marker>
         </defs>
 
-        {/* header */}
-        <text x={16} y={22} fontSize={11} fill="#64748b" fontWeight="700" letterSpacing={2}>
-          SOLID HANDLING
-        </text>
-        <line x1={16} y1={28} x2={1024} y2={28} stroke="#e2e8f0" strokeWidth={1} />
+        <rect x={0} y={0} width={1040} height={600} fill="#ffffff" />
 
-        {/* ── SILO 1 : WG & ISP ─────────────────────────── */}
-        <Silo x={20} y={SY} label="WG & ISP" sub="HOLDING SILO" />
-        <line x1={58} y1={SY + 96} x2={58} y2={SY + 148} stroke="#94a3b8" strokeWidth={3.5} />
-        <Hopper x={31} y={SY + 148} />
-        <text x={58} y={SY + 207} textAnchor="middle" fontSize={8.5} fill="#475569">Wheat Gluten &amp; ISP</text>
-        <Badge x={-2}  y={SY + 218} w={120} h={42} label="TARGET FLOW" value={d.wg_target_flow.toFixed(0)} unit="kg/h" c={BLUE} />
-        <Badge x={-2}  y={SY + 266} w={120} h={42} label="ACTUAL FLOW" value={d.wg_actual_flow.toFixed(0)} unit="kg/h" c={wgC} />
+        {/* ── Section panels ── */}
+        <rect x={12} y={40} width={548} height={420} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
+        <rect x={572} y={108} width={456} height={312} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
 
-        {/* ── SILO 2 : WF ───────────────────────────────── */}
-        <Silo x={165} y={SY} label="WF" sub="HOLDING SILO" />
-        <line x1={203} y1={SY + 96} x2={203} y2={SY + 148} stroke="#94a3b8" strokeWidth={3.5} />
-        <Hopper x={176} y={SY + 148} />
-        <text x={203} y={SY + 207} textAnchor="middle" fontSize={8.5} fill="#475569">Wheat Flour</text>
-        <Badge x={143} y={SY + 218} w={120} h={42} label="TARGET FLOW" value={d.wf_target_flow.toFixed(0)} unit="kg/h" c={BLUE} />
-        <Badge x={143} y={SY + 266} w={120} h={42} label="ACTUAL FLOW" value={d.wf_actual_flow.toFixed(0)} unit="kg/h" c={wfC} />
+        {/* ── Header ── */}
+        <text x={12} y={20} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>SOLID HANDLING</text>
+        <line x1={12} y1={26} x2={1028} y2={26} stroke="#dbe2ea" strokeWidth={1} />
 
-        {/* ── SILO 3 : Malted Barley ──────────────────────── */}
-        <Silo x={320} y={SY} label="MB" sub="BULK STORAGE" />
+        <text x={28} y={58} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif" letterSpacing={1}>FEED, MILLING & DOSING</text>
+        <text x={590} y={126} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif" letterSpacing={1}>MIXING & CONDITIONING</text>
+
+        {/* ════════════════════════════════════════════════
+            SILO 1 — WG & ISP
+        ════════════════════════════════════════════════ */}
+        <Silo x={wgCX - 38} y={SY} label="WG" sub="HOLDING SILO" />
+        {/* silo → hopper pipe */}
+        <line x1={wgCX} y1={SY + 96} x2={wgCX} y2={SY + 148} stroke="#94a3b8" strokeWidth={3.5} />
+        <Hopper x={wgCX - 27} y={SY + 148} />
+        {/* hopper → conveyor pipe */}
+        <line x1={wgCX} y1={SY + 192} x2={wgCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
+        {/* inline label + value — no card */}
+        <text x={wgCX + 32} y={SY + 168} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">WG & ISP</text>
+        <text x={wgCX + 32} y={SY + 184} fontSize={12} fill={wgC.text} fontWeight="700">{d.wg_actual_flow.toFixed(0)}</text>
+        <text x={wgCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h  tgt {d.wg_target_flow.toLocaleString()}</text>
+
+        {/* ════════════════════════════════════════════════
+            SILO 2 — WF
+        ════════════════════════════════════════════════ */}
+        <Silo x={wfCX - 38} y={SY} label="WF" sub="HOLDING SILO" />
+        <line x1={wfCX} y1={SY + 96} x2={wfCX} y2={SY + 148} stroke="#94a3b8" strokeWidth={3.5} />
+        <Hopper x={wfCX - 27} y={SY + 148} />
+        <line x1={wfCX} y1={SY + 192} x2={wfCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
+        {/* inline values */}
+        <text x={wfCX + 32} y={SY + 168} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Wheat Flour</text>
+        <text x={wfCX + 32} y={SY + 184} fontSize={12} fill={wfC.text} fontWeight="700">{d.wf_actual_flow.toFixed(0)}</text>
+        <text x={wfCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h  tgt {d.wf_target_flow}</text>
+
+        {/* ════════════════════════════════════════════════
+            SILO 3 — Malted Barley
+        ════════════════════════════════════════════════ */}
+        <Silo x={mbCX - 38} y={SY} label="MB" sub="BULK STORAGE" />
         {/* silo → mill */}
-        <line x1={358} y1={SY + 96} x2={358} y2={SY + 126} stroke="#94a3b8" strokeWidth={3.5} />
-        <Mill x={325} y={SY + 126} />
-        {/* gap / current callout */}
-        <text x={406} y={SY + 141} fontSize={9} fill="#6b7280">Gap</text>
-        <text x={406} y={SY + 155} fontSize={11} fill="#d97706" fontWeight="700"
-          fontFamily="'IBM Plex Mono',monospace">{d.mb_gap.toFixed(2)} mm</text>
-        <text x={406} y={SY + 171} fontSize={9} fill="#6b7280">Current</text>
-        <text x={406} y={SY + 185} fontSize={11} fill="#374151" fontWeight="700"
-          fontFamily="'IBM Plex Mono',monospace">{d.mb_current.toFixed(1)} A</text>
-        {/* mill → hopper */}
-        <line x1={358} y1={SY + 190} x2={358} y2={SY + 215} stroke="#94a3b8" strokeWidth={3.5} />
-        <Hopper x={331} y={SY + 215} />
-        <text x={358} y={SY + 273} textAnchor="middle" fontSize={8.5} fill="#475569">Malted Barley</text>
-        <Badge x={296} y={SY + 285} w={124} h={42} label="ACTUAL FLOW" value={d.mb_actual_flow.toFixed(0)} unit="kg/h" c={mbC} />
-        <Badge x={296} y={SY + 333} w={124} h={42} label="TARGET FLOW" value={d.mb_target_flow.toFixed(0)} unit="kg/h" c={BLUE} />
-        {/* % breakdown */}
-        <Badge x={432} y={SY + 218} w={108} h={42} label="% HUSK"   value={d.mb_husk_pct.toFixed(1)}  unit="%" c={PURPLE} />
-        <Badge x={432} y={SY + 266} w={108} h={42} label="% GRIST"  value={d.mb_grist_pct.toFixed(1)} unit="%" c={PURPLE} />
-        <Badge x={432} y={SY + 314} w={108} h={42} label="% POWDER" value={d.mb_powder_pct.toFixed(1)} unit="%" c={PURPLE} />
+        <line x1={mbCX} y1={SY + 96} x2={mbCX} y2={SY + 126} stroke="#94a3b8" strokeWidth={3.5} />
+        <Mill x={mbCX - 33} y={SY + 126} />
+        {/* mill gap / current — inline */}
+        <text x={mbCX + 40} y={SY + 141} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Gap</text>
+        <text x={mbCX + 40} y={SY + 154} fontSize={11} fill="#d97706" fontWeight="700">{d.mb_gap.toFixed(2)} mm</text>
+        <text x={mbCX + 40} y={SY + 168} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
+        <text x={mbCX + 40} y={SY + 181} fontSize={11} fill="#374151" fontWeight="700">{d.mb_current.toFixed(1)} A</text>
+        {/* mill → hopper pipe (straight, no badge blocking) */}
+        <line x1={mbCX} y1={SY + 190} x2={mbCX} y2={SY + 215} stroke="#94a3b8" strokeWidth={3.5} />
+        <Hopper x={mbCX - 27} y={SY + 215} />
+        {/* hopper → conveyor (straight clean pipe) */}
+        <line x1={mbCX} y1={SY + 259} x2={mbCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
+        {/* MB inline values */}
+        <text x={mbCX + 34} y={SY + 232} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Malted Barley</text>
+        <text x={mbCX + 34} y={SY + 247} fontSize={11} fill={mbC.text} fontWeight="700">{d.mb_actual_flow.toFixed(0)} kg/h</text>
+        {/* MB breakdown — clean inline */}
+        <text x={mbCX + 34} y={SY + 265} fontSize={8} fill="#7c3aed" fontWeight="600">Husk {d.mb_husk_pct.toFixed(1)}%</text>
+        <text x={mbCX + 34} y={SY + 278} fontSize={8} fill="#7c3aed" fontWeight="600">Grist {d.mb_grist_pct.toFixed(1)}%</text>
+        <text x={mbCX + 34} y={SY + 291} fontSize={8} fill="#7c3aed" fontWeight="600">Powder {d.mb_powder_pct.toFixed(1)}%</text>
 
-        {/* ── Pipes down to conveyor ─────────────────────── */}
-        <line x1={58}  y1={SY + 315} x2={58}  y2={PY}      stroke="#94a3b8" strokeWidth={3} />
-        <line x1={203} y1={SY + 315} x2={203} y2={PY}      stroke="#94a3b8" strokeWidth={3} />
-        <line x1={358} y1={SY + 378} x2={358} y2={PY}      stroke="#94a3b8" strokeWidth={3} />
-        {/* merge funnel */}
-        <polygon points={`200,${PY - 28} 280,${PY - 28} 262,${PY} 218,${PY}`}
+        {/* ── Merge funnel connecting all 3 pipes to conveyor ── */}
+        <polygon
+          points={`${wgCX - 10},${convY - 20} ${mbCX + 10},${convY - 20} ${mbCX - 5},${convY} ${wgCX + 5},${convY}`}
           fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1.2} />
 
-        {/* ── Screw conveyor ─────────────────────────────── */}
-        <ScrewConveyor x={50} y={PY} w={390} />
-        <Badge x={64}  y={PY + 36} w={130} h={42} label="FLOW RATE"
-          value={d.conveyor_flow_rate.toLocaleString()} unit="kg/h"
-          c={{ stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" }} />
-        <Badge x={204} y={PY + 36} w={156} h={42} label="%MB / %WG / %WF"
-          value={`${d.conveyor_pct_mb.toFixed(1)} / ${d.conveyor_pct_wg.toFixed(1)} / ${d.conveyor_pct_wf.toFixed(1)}`}
-          c={PURPLE} />
-
-        {/* ── Pipe: conveyor → mixing tank ─────────────────── */}
-        <line x1={440} y1={PY + 14} x2={TX + 14} y2={PY + 14} stroke="#3b82f6" strokeWidth={2.5} />
-        <line x1={TX + 14} y1={PY + 14} x2={TX + 14} y2={292}
-          stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSHmain)" />
-
-        {/* ── Mixing tank ────────────────────────────────── */}
-        <MixingTank x={TX} y={192} level={d.mixing_tank_level} />
-
-        {/* annotations */}
-        <text x={TX + 118} y={206} fontSize={9}  fill="#3b82f6" fontWeight="600">Water / Weak wort</text>
-        <text x={TX + 118} y={230} fontSize={9}  fill="#6b7280">RPM =
-          <tspan fill="#059669" fontWeight="700" fontFamily="monospace"> {d.mixing_rpm}</tspan>
-        </text>
-        <text x={TX + 118} y={246} fontSize={9}  fill="#6b7280">Current =
-          <tspan fill="#374151" fontWeight="700" fontFamily="monospace"> {d.mixing_current.toFixed(1)} A</tspan>
-        </text>
-        <text x={TX + 118} y={265} fontSize={9}  fill="#6b7280">Tank Level =
-          <tspan fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700" fontFamily="monospace"> {d.mixing_tank_level}%</tspan>
+        {/* ── Screw Conveyor ── */}
+        <ScrewConveyor x={convX} y={convY} w={convW} />
+        {/* conveyor inline values */}
+        <text x={convX + convW / 2} y={convY + 42} textAnchor="middle" fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">CONVEYOR FLOW</text>
+        <text x={convX + convW / 2} y={convY + 56} textAnchor="middle" fontSize={13} fill="#15803d" fontWeight="700">{d.conveyor_flow_rate.toLocaleString()} kg/h</text>
+        <text x={convX + convW / 2} y={convY + 68} textAnchor="middle" fontSize={8} fill="#7c3aed" fontWeight="600">
+          MB {d.conveyor_pct_mb.toFixed(1)}% / WG {d.conveyor_pct_wg.toFixed(1)}% / WF {d.conveyor_pct_wf.toFixed(1)}%
         </text>
 
-        <Badge x={TX + 116} y={278} w={152} h={42} label="FLOW RATE act / tgt"
-          value={`${d.mixing_flow_rate.toLocaleString()} / ${d.mixing_flow_target.toLocaleString()}`}
-          unit="kg/s" c={flC} />
-        <Badge x={TX + 116} y={326} w={152} h={42} label="% TS"
-          value={d.mixing_pct_ts.toFixed(1)} unit="%" c={SKY} />
-        <Badge x={TX + 116} y={374} w={152} h={42} label="%MB / %WG / %WF"
-          value={`${d.mixing_pct_mb.toFixed(1)} / ${d.mixing_pct_wg.toFixed(1)} / ${d.mixing_pct_wf.toFixed(1)}`}
-          c={PURPLE} />
+        {/* ── Pipe: conveyor → mixing tank ── */}
+        <line x1={convX + convW} y1={convY + 14} x2={TX + 30} y2={convY + 14}
+          stroke="#3b82f6" strokeWidth={2.5} />
+        <line x1={TX + 30} y1={convY + 14} x2={TX + 30} y2={tankY + 18}
+          stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSH)" />
 
-        {/* ══ OUTPUT STRIP ════════════════════════════════ */}
-        <rect x={16} y={510} width={1008} height={116} rx={8}
-          fill="#f8fafc" stroke="#e2e8f0" strokeWidth={1.5} />
-        <rect x={16} y={510} width={5} height={116} rx={3} fill="#3b82f6" />
-        <text x={36} y={530} fontSize={10} fill="#374151" fontWeight="700" letterSpacing={1}>
+        {/* ── Mixing Tank ── */}
+        <MixingTank x={TX} y={tankY} level={d.mixing_tank_level} />
+
+        {/* ── Info panel — right of mixing tank, center-aligned with conveyor ──
+            Center of conveyor: convX + convW/2 = 245
+            Panel width: 200, so x = 245 + offset. But mixing tank is at TX=596.
+            We position panel to the right of the tank, directly beside it. */}
+        <rect x={TX + 102} y={tankY - 4} width={198} height={226} rx={14}
+          fill="#ffffff" stroke="#dbe2ea" strokeWidth={1} />
+        <text x={TX + 115} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
+        <line x1={TX + 115} y1={tankY + 18} x2={TX + 292} y2={tankY + 18} stroke="#dbe2ea" strokeWidth={0.8} />
+
+        {/* RPM, Current, Level — inline */}
+        <text x={TX + 115} y={tankY + 38} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">RPM</text>
+        <text x={TX + 200} y={tankY + 38} textAnchor="end" fontSize={11} fill="#059669" fontWeight="700">{d.mixing_rpm}</text>
+        <text x={TX + 115} y={tankY + 56} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
+        <text x={TX + 200} y={tankY + 56} textAnchor="end" fontSize={11} fill="#374151" fontWeight="700">{d.mixing_current.toFixed(1)} A</text>
+        <text x={TX + 115} y={tankY + 74} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Tank Level</text>
+        <text x={TX + 200} y={tankY + 74} textAnchor="end" fontSize={11}
+          fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700">{d.mixing_tank_level}%</text>
+
+        <line x1={TX + 115} y1={tankY + 83} x2={TX + 292} y2={tankY + 83} stroke="#dbe2ea" strokeWidth={0.8} />
+
+        <text x={TX + 115} y={tankY + 100} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">FLOW RATE  act / tgt</text>
+        <text x={TX + 115} y={tankY + 116} fontSize={10} fill={flC.text} fontWeight="700">
+          {d.mixing_flow_rate.toLocaleString()} / {d.mixing_flow_target.toLocaleString()}
+        </text>
+        <text x={TX + 115} y={tankY + 128} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
+
+        <line x1={TX + 115} y1={tankY + 136} x2={TX + 292} y2={tankY + 136} stroke="#dbe2ea" strokeWidth={0.8} />
+
+        <text x={TX + 115} y={tankY + 152} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">% TS</text>
+        <text x={TX + 200} y={tankY + 152} textAnchor="end" fontSize={11} fill="#0369a1" fontWeight="700">{d.mixing_pct_ts.toFixed(1)}%</text>
+        <text x={TX + 115} y={tankY + 168} fontSize={8.5} fill="#7c3aed" fontWeight="600">
+          MB {d.mixing_pct_mb.toFixed(1)}%  WG {d.mixing_pct_wg.toFixed(1)}%  WF {d.mixing_pct_wf.toFixed(1)}%
+        </text>
+
+        {/* ── OUTPUT STRIP ── */}
+        <rect x={12} y={490} width={1016} height={98} rx={14}
+          fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.4} />
+        <rect x={12} y={490} width={5} height={98} rx={3} fill="#3b82f6" />
+        <text x={28} y={508} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>
           TAB OUTPUT — CALCULATED BY FASTAPI
         </text>
-        <line x1={36} y1={536} x2={1020} y2={536} stroke="#e2e8f0" strokeWidth={1} />
+        <line x1={28} y1={514} x2={1024} y2={514} stroke="#dbe2ea" strokeWidth={1} />
 
         {([
-          { label: "BOM OUTPUT",         value: d.output_bom.toFixed(2),           c: SKY  },
-          { label: "STD OUTPUT (kg)",    value: d.output_std_kg.toLocaleString(),  c: { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" } },
-          { label: "ACTUAL OUTPUT (kg)", value: d.output_actual_kg.toLocaleString(), c: sc(d.output_actual_kg, d.output_std_kg) },
-          { label: "WASTAGE %",          value: d.output_wastage_pct.toFixed(2) + "%", c: waC },
-        ] as { label: string; value: string; c: Clr }[]).map((kpi, i) => (
+          { label: "BOM OUTPUT",         value: d.output_bom.toFixed(2),              color: "#0369a1" },
+          { label: "STD OUTPUT (kg)",    value: d.output_std_kg.toLocaleString(),     color: "#15803d" },
+          { label: "ACTUAL OUTPUT (kg)", value: d.output_actual_kg.toLocaleString(),  color: sc(d.output_actual_kg, d.output_std_kg).text },
+          { label: "WASTAGE %",          value: d.output_wastage_pct.toFixed(2) + "%", color: waC.text },
+        ] as { label: string; value: string; color: string }[]).map((kpi, i) => (
           <g key={i}>
-            <rect x={36 + i * 252} y={544} width={234} height={70} rx={7}
-              fill={kpi.c.fill} stroke={kpi.c.stroke} strokeWidth={1.3} />
-            <text x={36 + i * 252 + 117} y={562} textAnchor="middle"
-              fontSize={9.5} fill="#6b7280" letterSpacing={0.5}>{kpi.label}</text>
-            <text x={36 + i * 252 + 117} y={600} textAnchor="middle"
-              fontSize={22} fontWeight="700" fill={kpi.c.text}
-              fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
+            <text x={36 + i * 254} y={532} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
+            <text x={36 + i * 254} y={562} fontSize={22} fontWeight="700" fill={kpi.color} fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
           </g>
         ))}
       </svg>

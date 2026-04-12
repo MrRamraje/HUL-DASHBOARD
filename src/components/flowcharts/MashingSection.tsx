@@ -42,72 +42,120 @@ const mockData: MashingData = {
   output_wastage_pct: 2.34,
 };
 
-function tempColor(actual: number, setpoint: number) {
+const hexSetpoints = [60, 64, 74, 74, 74, 80];
+
+function tempColor(actual: number, setpoint: number): string {
   const diff = Math.abs(actual - setpoint);
   if (diff < 0.5) return "#22c55e";
   if (diff < 1.5) return "#f59e0b";
   return "#ef4444";
 }
 
-function ValueBox({ x, y, w = 120, label, value, color = "#22c55e" }: {
-  x: number; y: number; w?: number; label: string; value: string; color?: string;
-}) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={36} rx={10} fill={color + "14"} stroke={color} strokeWidth={1.1} />
-      <text x={x + w / 2} y={y + 12} textAnchor="middle" fontSize={8.5} fill="#64748b" fontFamily="'IBM Plex Mono', monospace">{label}</text>
-      <text x={x + w / 2} y={y + 27} textAnchor="middle" fontSize={12} fontWeight="700" fill={color} fontFamily="'IBM Plex Mono', monospace">{value}</text>
-    </g>
-  );
-}
-
+// ─── Mixing Tank ──────────────────────────────────────────────────────────────
 function MixingTankM({ x, y, label, level }: { x: number; y: number; label: string; level: number }) {
-  const h = 100;
-  const fillH = Math.max(4, (level / 100) * (h - 10));
-  const fc = level < 40 ? "#ef4444" : level < 65 ? "#f59e0b" : "#22c55e";
+  const H = 96, W = 78, cx = x + W / 2;
+  const fillH = Math.max(4, (level / 100) * (H - 10));
+  const lc = level < 40 ? "#ef4444" : level < 65 ? "#f59e0b" : "#22c55e";
   return (
     <g>
-      <line x1={x + 20} y1={y - 30} x2={x + 20} y2={y} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
-      <ellipse cx={x + 40} cy={y} rx={40} ry={8} fill="#e2e8f0" stroke="#cbd5e1" strokeWidth={1.2} />
-      <rect x={x} y={y} width={80} height={h} fill="#ffffff" stroke="#cbd5e1" strokeWidth={1.2} />
-      <rect x={x} y={y + h - fillH} width={80} height={fillH} fill={fc} opacity={0.18} />
-      <rect x={x + 64} y={y} width={16} height={h} fill="#f8fafc" />
-      <ellipse cx={x + 40} cy={y + h} rx={40} ry={8} fill="#f8fafc" stroke="#cbd5e1" strokeWidth={1.2} />
-      <text x={x + 36} y={y + h / 2 - 7} textAnchor="middle" fontSize={9} fill="#475569">{label}</text>
-      <text x={x + 36} y={y + h / 2 + 7} textAnchor="middle" fontSize={9} fill="#475569">TANK</text>
-      <rect x={x + 82} y={y + 6} width={6} height={h - 12} rx={2} fill="#ffffff" stroke="#cbd5e1" strokeWidth={0.8} />
-      <rect x={x + 83} y={y + 6 + (h - 12) * (1 - level / 100)} width={4}
-        height={(h - 12) * (level / 100)} rx={1} fill={fc} opacity={0.8} />
-      <line x1={x + 16} y1={y + h + 8} x2={x + 16} y2={y + h + 20} stroke="#cbd5e1" strokeWidth={3} />
-      <line x1={x + 40} y1={y + h + 8} x2={x + 40} y2={y + h + 20} stroke="#cbd5e1" strokeWidth={3} />
-      <line x1={x + 64} y1={y + h + 8} x2={x + 64} y2={y + h + 20} stroke="#cbd5e1" strokeWidth={3} />
+      {/* water inlet arrow */}
+      <line x1={cx} y1={y - 28} x2={cx} y2={y} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
+      {/* top ellipse */}
+      <ellipse cx={cx} cy={y} rx={W / 2} ry={8} fill="#e2e8f0" stroke="#cbd5e1" strokeWidth={1.2} />
+      {/* body */}
+      <rect x={x} y={y} width={W} height={H} fill="#ffffff" stroke="#cbd5e1" strokeWidth={1.2} />
+      {/* liquid fill */}
+      <rect x={x + 1} y={y + H - fillH} width={W - 14} height={fillH} fill={lc} opacity={0.14} />
+      {/* right shade */}
+      <rect x={x + W - 13} y={y} width={13} height={H} fill="#f1f5f9" />
+      {/* bottom ellipse */}
+      <ellipse cx={cx} cy={y + H} rx={W / 2} ry={8} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth={1.2} />
+      {/* level bar */}
+      <rect x={x + W + 4} y={y + 4} width={6} height={H - 8} rx={2} fill="#f1f5f9" stroke="#dbe2ea" strokeWidth={0.8} />
+      <rect x={x + W + 5} y={y + 4 + (H - 8) * (1 - level / 100)} width={4}
+        height={(H - 8) * (level / 100)} rx={1} fill={lc} opacity={0.85} />
+      {/* label */}
+      <text x={cx - 6} y={y + H / 2 - 5} textAnchor="middle" fontSize={8.5} fill="#64748b" fontFamily="sans-serif">{label}</text>
+      <text x={cx - 6} y={y + H / 2 + 8} textAnchor="middle" fontSize={8.5} fill="#64748b" fontFamily="sans-serif">TANK</text>
+      {/* level text */}
+      <text x={cx - 4} y={y + H + 20} textAnchor="middle" fontSize={9} fill={lc} fontWeight="700" fontFamily="'IBM Plex Mono',monospace">{level}%</text>
+      {/* outlet legs */}
+      {[12, cx - x, W - 12].map((lx, i) => (
+        <line key={i} x1={x + lx} y1={y + H + 8} x2={x + lx} y2={y + H + 18} stroke="#cbd5e1" strokeWidth={3} />
+      ))}
     </g>
   );
 }
 
+// ─── Heat Exchanger with Circular Coil ───────────────────────────────────────
 function HeatExchangerSVG({ x, y, temp, actualTemp }: {
   x: number; y: number; temp: number; actualTemp: number;
 }) {
   const color = tempColor(actualTemp, temp);
+  const W = 52, H = 90;
+  const cx = x + W / 2;
+  const nLoops = 6;
+  const rx = 17, ry = 6;
+  const coilTop = y + 10;
+  const coilBottom = y + H - 10;
+  const loopStep = (coilBottom - coilTop - ry * 2) / (nLoops - 1);
+
   return (
     <g>
-      <rect x={x} y={y} width={52} height={90} rx={8} fill="#ffffff" stroke="#cbd5e1" strokeWidth={1.2} />
-      <rect x={x + 42} y={y} width={10} height={90} rx={3} fill="#f8fafc" />
-      {Array.from({ length: 4 }).map((_, i) => (
-        <g key={i}>
-          <rect x={x + 6} y={y + 8 + i * 18} width={32} height={14} rx={2}
-            fill={color + "20"} stroke={color} strokeWidth={0.8} />
-          <line x1={x + 9} y1={y + 15 + i * 18} x2={x + 34} y2={y + 15 + i * 18} stroke={color} strokeWidth={0.4} opacity={0.5} />
-        </g>
-      ))}
-      <line x1={x + 16} y1={y - 12} x2={x + 16} y2={y} stroke="#64748b" strokeWidth={1.5} />
-      <line x1={x + 30} y1={y} x2={x + 30} y2={y - 12} stroke="#64748b" strokeWidth={1.5} />
-      <text x={x + 26} y={y + 104} textAnchor="middle" fontSize={11} fill={color} fontWeight="700" fontFamily="'IBM Plex Mono', monospace">{actualTemp.toFixed(1)}°C</text>
-      <text x={x + 26} y={y + 116} textAnchor="middle" fontSize={9} fill="#64748b" fontFamily="monospace">sp:{temp}°C</text>
+      {/* body */}
+      <rect x={x} y={y} width={W} height={H} rx={8} fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.2} />
+      {/* right shade panel */}
+      <rect x={x + W - 10} y={y + 1} width={9} height={H - 2} rx={0} fill="#f8fafc" />
+      <rect x={x + W - 10} y={y} width={10} height={H} rx={8} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
+
+      {/* flow connections top */}
+      <line x1={x + 14} y1={y - 12} x2={x + 14} y2={y} stroke="#94a3b8" strokeWidth={1.4} />
+      <line x1={x + 28} y1={y} x2={x + 28} y2={y - 12} stroke="#94a3b8" strokeWidth={1.4} />
+
+      {/* ── Circular coil (spring) ── */}
+      {Array.from({ length: nLoops }).map((_, i) => {
+        const ly = coilTop + ry + i * loopStep;
+        // back arc (upper half, lighter)
+        const backD = `M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 1 ${cx + rx} ${ly}`;
+        // front arc (lower half, solid)
+        const frontD = `M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 0 ${cx + rx} ${ly}`;
+        return (
+          <g key={i}>
+            {/* back arc */}
+            <path d={backD} fill="none" stroke={color} strokeWidth={2.4} opacity={0.22} strokeLinecap="round" />
+            {/* connecting lines between loops */}
+            {i < nLoops - 1 && (
+              <>
+                <line
+                  x1={cx - rx} y1={ly}
+                  x2={cx - rx} y2={ly + loopStep}
+                  stroke={color} strokeWidth={2.4} opacity={0.55} strokeLinecap="round"
+                />
+                <line
+                  x1={cx + rx} y1={ly}
+                  x2={cx + rx} y2={ly + loopStep}
+                  stroke={color} strokeWidth={2.4} opacity={0.2} strokeLinecap="round"
+                />
+              </>
+            )}
+            {/* front arc */}
+            <path d={frontD} fill="none" stroke={color} strokeWidth={2.4} opacity={0.88} strokeLinecap="round" />
+          </g>
+        );
+      })}
+
+      {/* outlet */}
+      <line x1={cx} y1={y + H} x2={cx} y2={y + H + 14} stroke="#94a3b8" strokeWidth={1.4} />
+
+      {/* temp label below */}
+      <text x={cx} y={y + H + 26} textAnchor="middle" fontSize={11} fontWeight="700"
+        fill={color} fontFamily="'IBM Plex Mono',monospace">{actualTemp.toFixed(1)}°C</text>
+      <text x={cx} y={y + H + 38} textAnchor="middle" fontSize={8} fill="#94a3b8" fontFamily="monospace">sp {temp}°C</text>
     </g>
   );
 }
 
+// ─── Main component ───────────────────────────────────────────────────────────
 const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) => {
   const [liveData, setLiveData] = useState(data);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -134,97 +182,142 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
 
   const d = liveData;
   const wastageColor = d.output_wastage_pct > 4 ? "#ef4444" : d.output_wastage_pct > 1 ? "#f59e0b" : "#22c55e";
-  const tank1X = 30;
-  const tank2X = 400;
-  const hexSetpoints = [60, 64, 74, 74, 74, 80];
-  const hexPositions = [150, 220, 295, 490, 563, 636];
+  const effColor = d.output_mashing_efficiency > 93 ? "#22c55e" : d.output_mashing_efficiency > 88 ? "#f59e0b" : "#ef4444";
+  const avgDeviation = (d.hex.reduce((s, h, i) => s + Math.abs(h.temp_actual - hexSetpoints[i]), 0) / 6).toFixed(2);
+
+  // Layout
+  const tank1X = 48, tank1Y = 112;
+  const tank2X = 468, tank2Y = 112;
+  const hexY = 128;
+  const hexPositions = [174, 250, 326, 556, 632, 708];
+  const flowY = tank1Y + 48; // center of tanks for horizontal pipe
 
   return (
-    <div style={{ background: "#eef2ff", padding: "10px 0" }}>
-      <svg width="100%" viewBox="0 0 1000 560" fontFamily="'IBM Plex Mono', monospace">
+    <div style={{ background: "#ffffff", padding: "16px 0 8px", borderRadius: 18 }}>
+      <svg width="100%" viewBox="0 0 1000 500" fontFamily="'IBM Plex Mono', monospace">
         <defs>
-          <marker id="arrowBlueMash" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <marker id="arrowM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M2 2L8 5L2 8" fill="none" stroke="#3b82f6" strokeWidth={1.5} />
           </marker>
-          <marker id="arrowGrayMash" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M2 2L8 5L2 8" fill="none" stroke="#64748b" strokeWidth={1.5} />
+          <marker id="arrowGM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 2L8 5L2 8" fill="none" stroke="#94a3b8" strokeWidth={1.5} />
           </marker>
+          <clipPath id="hexClip">
+            <rect x="0" y="0" width="52" height="90" rx="8" />
+          </clipPath>
         </defs>
 
-        <rect x="0" y="0" width="1000" height="560" fill="#eef2ff" />
-        <text x={20} y={28} fontSize={13} fill="#0f172a" fontWeight="700" letterSpacing={1}>Mashing Section</text>
-        <line x1={20} y1={34} x2={980} y2={34} stroke="#cbd5e1" strokeWidth={1} />
+        <rect x={0} y={0} width={1000} height={500} fill="#ffffff" />
 
-        <text x={40} y={64} fontSize={10} fill="#64748b" fontFamily="sans-serif">Water range</text>
-        <text x={40} y={78} fontSize={11} fill="#3b82f6" fontWeight="700">{d.water_flow_min.toLocaleString()}–{d.water_flow_max.toLocaleString()} kg/h</text>
-        <ValueBox x={40} y={84} w={140} label="Actual flow" value={d.water_flow.toLocaleString() + " kg/h"} color="#3b82f6" />
+        {/* ── Section panel ── */}
+        <rect x={12} y={12} width={976} height={296} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
 
-        <MixingTankM x={tank1X} y={120} label="MIXING" level={d.mixing_tank1_level} />
-        <text x={tank1X + 40} y={238} textAnchor="middle" fontSize={9} fill="#64748b">Level: {d.mixing_tank1_level}%</text>
-        <line x1={tank1X + 80} y1={170} x2={hexPositions[0]} y2={170} stroke="#3b82f6" strokeWidth={2} />
+        {/* ── Header ── */}
+        <text x={28} y={32} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>MASHING SECTION</text>
+        <line x1={28} y1={38} x2={972} y2={38} stroke="#dbe2ea" strokeWidth={1} />
 
+        {/* ── Header metrics (inline, no cards) ── */}
+        <text x={28} y={58} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">WATER FLOW</text>
+        <text x={28} y={72} fontSize={13} fill="#3b82f6" fontWeight="700">{d.water_flow.toLocaleString()} kg/h</text>
+        <text x={28} y={84} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">range {d.water_flow_min.toLocaleString()}–{d.water_flow_max.toLocaleString()}</text>
+
+        <text x={200} y={58} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">RECIPE</text>
+        <text x={200} y={72} fontSize={13} fill="#0ea5e9" fontWeight="700">2 tanks / 6 HEX</text>
+
+        <text x={820} y={58} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">AVG TEMP DEV</text>
+        <text x={820} y={72} fontSize={13} fill="#0ea5e9" fontWeight="700">{avgDeviation}°C</text>
+
+        {/* ── Process flow container ── */}
+        <rect x={28} y={98} width={944} height={200} rx={14} fill="#ffffff" stroke="#dbe2ea" strokeWidth={1} />
+        <text x={44} y={114} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">PROCESS FLOW</text>
+
+        {/* ── Mixing Tank 1 ── */}
+        <MixingTankM x={tank1X} y={tank1Y} label="MIXING" level={d.mixing_tank1_level} />
+
+        {/* pipe: tank1 → HEX 1 */}
+        <line x1={tank1X + 78} y1={flowY} x2={hexPositions[0]} y2={flowY}
+          stroke="#3b82f6" strokeWidth={2} />
+
+        {/* HEX 1–3 */}
         {[0, 1, 2].map(i => (
           <g key={i}>
-            <HeatExchangerSVG x={hexPositions[i]} y={140} temp={hexSetpoints[i]} actualTemp={d.hex[i].temp_actual} />
+            <HeatExchangerSVG x={hexPositions[i]} y={hexY} temp={hexSetpoints[i]} actualTemp={d.hex[i].temp_actual} />
             {i < 2 && (
-              <line x1={hexPositions[i] + 52} y1={170} x2={hexPositions[i + 1]} y2={170} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
+              <line x1={hexPositions[i] + 52} y1={flowY} x2={hexPositions[i + 1]} y2={flowY}
+                stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
             )}
           </g>
         ))}
 
-        <line x1={hexPositions[2] + 52} y1={170} x2={tank2X} y2={170} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
-        <line x1={300} y1={58} x2={300} y2={170} stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 3" markerEnd="url(#arrowGrayMash)" />
-        <text x={308} y={68} fontSize={10} fill="#64748b">steam</text>
+        {/* steam input */}
+        <line x1={338} y1={78} x2={338} y2={hexY} stroke="#94a3b8" strokeWidth={1.4} strokeDasharray="4 3" markerEnd="url(#arrowGM)" />
+        <text x={344} y={90} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">steam</text>
 
-        <line x1={tank2X + 20} y1={70} x2={tank2X + 20} y2={120} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
-        <MixingTankM x={tank2X} y={120} label="MIXING" level={d.mixing_tank2_level} />
-        <text x={tank2X + 40} y={238} textAnchor="middle" fontSize={9} fill="#64748b">Level: {d.mixing_tank2_level}%</text>
+        {/* pipe: HEX3 → Tank2 */}
+        <line x1={hexPositions[2] + 52} y1={flowY} x2={tank2X} y2={flowY}
+          stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
 
-        <line x1={tank2X + 80} y1={170} x2={hexPositions[3]} y2={170} stroke="#3b82f6" strokeWidth={2} />
+        {/* Mixing Tank 2 water inlet */}
+        <line x1={tank2X + 39} y1={78} x2={tank2X + 39} y2={tank2Y}
+          stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
+
+        {/* ── Mixing Tank 2 ── */}
+        <MixingTankM x={tank2X} y={tank2Y} label="MIXING" level={d.mixing_tank2_level} />
+
+        {/* pipe: tank2 → HEX 4 */}
+        <line x1={tank2X + 78} y1={flowY} x2={hexPositions[3]} y2={flowY}
+          stroke="#3b82f6" strokeWidth={2} />
+
+        {/* HEX 4–6 */}
         {[3, 4, 5].map(i => (
           <g key={i}>
-            <HeatExchangerSVG x={hexPositions[i]} y={140} temp={hexSetpoints[i]} actualTemp={d.hex[i].temp_actual} />
+            <HeatExchangerSVG x={hexPositions[i]} y={hexY} temp={hexSetpoints[i]} actualTemp={d.hex[i].temp_actual} />
             {i < 5 && (
-              <line x1={hexPositions[i] + 52} y1={170} x2={hexPositions[i + 1]} y2={170} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
+              <line x1={hexPositions[i] + 52} y1={flowY} x2={hexPositions[i + 1]} y2={flowY}
+                stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
             )}
           </g>
         ))}
 
-        <line x1={hexPositions[5] + 52} y1={170} x2={940} y2={170} stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowBlueMash)" />
-        <text x={946} y={165} fontSize={9} fill="#3b82f6">out</text>
+        {/* pipe: HEX6 → output */}
+        <line x1={hexPositions[5] + 52} y1={flowY} x2={952} y2={flowY}
+          stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowM)" />
+        <text x={958} y={flowY - 4} fontSize={8} fill="#3b82f6">out</text>
 
-        <line x1={590} y1={58} x2={590} y2={170} stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 3" markerEnd="url(#arrowBlueMash)" />
-        <line x1={760} y1={58} x2={760} y2={170} stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 3" markerEnd="url(#arrowBlueMash)" />
+        {/* water / steam dashes to HEX 5 & 6 */}
+        <line x1={660} y1={78} x2={660} y2={hexY} stroke="#3b82f6" strokeWidth={1.4} strokeDasharray="4 3" markerEnd="url(#arrowM)" />
+        <line x1={800} y1={78} x2={800} y2={hexY} stroke="#3b82f6" strokeWidth={1.4} strokeDasharray="4 3" markerEnd="url(#arrowM)" />
 
-        <text x={20} y={310} fontSize={10} fill="#64748b" letterSpacing={1}>Temperature profile</text>
+        {/* ── Temperature profile strip ── */}
+        <rect x={12} y={322} width={976} height={62} rx={14} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.1} />
+        <text x={28} y={338} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif" letterSpacing={1}>TEMPERATURE PROFILE</text>
         {d.hex.map((h, i) => {
-          const barX = 20 + i * 152;
+          const bx = 28 + i * 160;
           const c = tempColor(h.temp_actual, hexSetpoints[i]);
           return (
             <g key={i}>
-              <rect x={barX} y={318} width={138} height={48} rx={10} fill={c + "14"} stroke={c} strokeWidth={1} />
-              <text x={barX + 69} y={332} textAnchor="middle" fontSize={9} fill="#64748b">HEX {i + 1} — sp {hexSetpoints[i]}°C</text>
-              <text x={barX + 69} y={354} textAnchor="middle" fontSize={16} fontWeight="700" fill={c}>{h.temp_actual.toFixed(1)}°C</text>
+              <text x={bx} y={354} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">HEX {i + 1}  sp {hexSetpoints[i]}°C</text>
+              <text x={bx} y={374} fontSize={16} fontWeight="700" fill={c} fontFamily="'IBM Plex Mono',monospace">{h.temp_actual.toFixed(1)}°C</text>
             </g>
           );
         })}
 
-        <rect x={20} y={400} width={960} height={110} rx={16} fill="#ffffff" stroke="#cbd5e1" strokeWidth={1.5} />
-        <rect x={20} y={400} width={960} height={24} rx={16} fill="#e2e8f0" />
-        <text x={36} y={416} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>Tab output — Calculated by FastAPI</text>
-        <line x1={20} y1={424} x2={980} y2={424} stroke="#e2e8f0" strokeWidth={1} />
+        {/* ── Output strip ── */}
+        <rect x={12} y={400} width={976} height={88} rx={16} fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.4} />
+        <rect x={12} y={400} width={5} height={88} rx={3} fill="#3b82f6" />
+        <text x={28} y={418} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>TAB OUTPUT — CALCULATED BY FASTAPI</text>
+        <line x1={28} y1={424} x2={984} y2={424} stroke="#dbe2ea" strokeWidth={1} />
 
         {[
-          { label: "Mashing efficiency", value: d.output_mashing_efficiency.toFixed(1) + "%", color: "#22c55e", target: "Target: 95%" },
-          { label: "Avg temp deviation", value: (d.hex.reduce((s, h, i) => s + Math.abs(h.temp_actual - hexSetpoints[i]), 0) / 6).toFixed(2) + "°C", color: "#38bdf8", target: "" },
-          { label: "Actual output", value: d.output_actual_kg.toLocaleString(), color: "#f59e0b", target: `Std: ${d.output_std_kg.toLocaleString()}` },
-          { label: "Wastage %", value: d.output_wastage_pct.toFixed(2) + "%", color: wastageColor, target: "" },
+          { label: "MASHING EFFICIENCY", value: d.output_mashing_efficiency.toFixed(1) + "%", color: effColor, sub: "Target: 95%" },
+          { label: "AVG TEMP DEVIATION", value: avgDeviation + "°C", color: "#38bdf8", sub: "" },
+          { label: "ACTUAL OUTPUT", value: d.output_actual_kg.toLocaleString() + " kg", color: "#f59e0b", sub: `Std: ${d.output_std_kg.toLocaleString()}` },
+          { label: "WASTAGE", value: d.output_wastage_pct.toFixed(2) + "%", color: wastageColor, sub: "" },
         ].map((kpi, i) => (
           <g key={i}>
-            <rect x={36 + i * 240} y={432} width={216} height={66} rx={12} fill={kpi.color + "14"} stroke={kpi.color} strokeWidth={1.2} />
-            <text x={36 + i * 240 + 108} y={450} textAnchor="middle" fontSize={10} fill="#64748b">{kpi.label}</text>
-            <text x={36 + i * 240 + 108} y={480} textAnchor="middle" fontSize={20} fontWeight="700" fill={kpi.color}>{kpi.value}</text>
-            {kpi.target && <text x={36 + i * 240 + 108} y={495} textAnchor="middle" fontSize={8.5} fill="#475569">{kpi.target}</text>}
+            <text x={36 + i * 244} y={442} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
+            <text x={36 + i * 244} y={466} fontSize={20} fontWeight="700" fill={kpi.color} fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
+            {kpi.sub && <text x={36 + i * 244} y={479} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.sub}</text>}
           </g>
         ))}
       </svg>
