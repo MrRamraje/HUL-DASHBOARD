@@ -76,34 +76,23 @@ function MiniMixTank({ x, y, level }: { x: number; y: number; level: number }) {
 
 // ─── Mini HEX with coil ───────────────────────────────────────────────────────
 function MiniHex({ x, y, temp, actual }: { x: number; y: number; temp: number; actual: number }) {
-  const ok  = Math.abs(actual - temp) < 1;
-  const c   = ok ? "#16a34a" : "#d97706";
+  const c = "#1f2937";
   const W = 32, H = 54;
   const cx = x + W / 2;
-  const nLoops = 4;
-  const rx = 10, ry = 4;
-  const startY = y + 6, endY = y + H - 6;
-  const step = (endY - startY - ry * 2) / (nLoops - 1);
   return (
     <g>
-      <rect x={x} y={y} width={W} height={H} rx={4}
-        fill="#ffffff" stroke={c} strokeWidth={0.9} />
-      {/* coil loops */}
-      {Array.from({ length: nLoops }).map((_, i) => {
-        const ly = startY + ry + i * step;
-        return (
-          <g key={i}>
-            <path d={`M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 1 ${cx + rx} ${ly}`}
-              fill="none" stroke={c} strokeWidth={1.5} opacity={0.2} strokeLinecap="round" />
-            {i < nLoops - 1 && (
-              <line x1={cx - rx} y1={ly} x2={cx - rx} y2={ly + step}
-                stroke={c} strokeWidth={1.5} opacity={0.45} strokeLinecap="round" />
-            )}
-            <path d={`M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 0 ${cx + rx} ${ly}`}
-              fill="none" stroke={c} strokeWidth={1.5} opacity={0.85} strokeLinecap="round" />
-          </g>
-        );
-      })}
+      {/* coil image */}
+      <image
+        href="/images/coil.png"
+        x={x + 3}
+        y={y + 4}
+        width={W - 6}
+        height={H - 8}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      {/* image border */}
+      <rect x={x + 3} y={y + 4} width={W - 6} height={H - 8} rx={4}
+        fill="none" stroke={c} strokeWidth={0.9} />
       {/* flow lines top */}
       <line x1={x + 10} y1={y - 7} x2={x + 10} y2={y} stroke="#94a3b8" strokeWidth={1} />
       <line x1={x + 22} y1={y} x2={x + 22} y2={y - 7} stroke="#94a3b8" strokeWidth={1} />

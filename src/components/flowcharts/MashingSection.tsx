@@ -154,16 +154,7 @@ function HeatExchangerSVG({
   const W = 56, H = 92;
   const cx = x + W / 2;
 
-  const clr  = tempClr(actualTemp, temp);
-  const nLoops = 5;
-
-  // Coil geometry — keep it fully inside the body
-  const coilPad = 10;            // padding from top/bottom of body
-  const coilTop = y + coilPad;
-  const coilBot = y + H - coilPad;
-  const rx = 18, ry = 5;        // ellipse radii for each loop
-  const totalSpan = coilBot - coilTop - ry * 2;
-  const step = nLoops > 1 ? totalSpan / (nLoops - 1) : 0;
+  const clr: Clr = { stroke: "#1f2937", fill: "#ffffff", text: "#1f2937" };
 
   // Two inlet/outlet stubs on top, symmetrically about cx
   const stubOffset = 10;
@@ -184,57 +175,18 @@ function HeatExchangerSVG({
         stroke="#94a3b8" strokeWidth={1.4} strokeLinecap="round"
         markerEnd="url(#arrowGrayMash)" />
 
-      {/* ── body ── */}
-      <rect x={x} y={y} width={W} height={H} rx={8}
-        fill={clr.fill} stroke={clr.stroke} strokeWidth={1.3} />
-
-      {/* right shade panel */}
-      <rect x={x + W - 10} y={y + 1} width={9} height={H - 2} rx={0}
-        fill="#00000008" />
-      <rect x={x + W - 10} y={y} width={10} height={H} rx={8}
-        fill="none" stroke={clr.stroke} strokeWidth={1.3} />
-
-      {/* ── coil (spring helix) centred inside body ── */}
-      {Array.from({ length: nLoops }).map((_, i) => {
-        const ly = coilTop + ry + i * step;
-
-        // back semi-arc (upper half — lighter, suggests depth)
-        const backD  = `M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 1 ${cx + rx} ${ly}`;
-        // front semi-arc (lower half — solid, in front)
-        const frontD = `M ${cx - rx} ${ly} A ${rx} ${ry} 0 0 0 ${cx + rx} ${ly}`;
-
-        return (
-          <g key={i}>
-            {/* back arc */}
-            <path d={backD} fill="none"
-              stroke={clr.stroke} strokeWidth={2.2}
-              opacity={0.25} strokeLinecap="round" />
-
-            {/* vertical connecting lines between loops */}
-            {i < nLoops - 1 && (
-              <>
-                {/* left side connector */}
-                <line
-                  x1={cx - rx} y1={ly}
-                  x2={cx - rx} y2={ly + step}
-                  stroke={clr.stroke} strokeWidth={2.2}
-                  opacity={0.6} strokeLinecap="round" />
-                {/* right side connector (lighter — behind) */}
-                <line
-                  x1={cx + rx} y1={ly}
-                  x2={cx + rx} y2={ly + step}
-                  stroke={clr.stroke} strokeWidth={2.2}
-                  opacity={0.22} strokeLinecap="round" />
-              </>
-            )}
-
-            {/* front arc */}
-            <path d={frontD} fill="none"
-              stroke={clr.stroke} strokeWidth={2.2}
-              opacity={0.92} strokeLinecap="round" />
-          </g>
-        );
-      })}
+      {/* ── coil image ── */}
+      <image
+        href="/images/coil.png"
+        x={x + 6}
+        y={y + 8}
+        width={W - 16}
+        height={H - 16}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      {/* image border */}
+      <rect x={x + 6} y={y + 8} width={W - 16} height={H - 16} rx={6}
+        fill="none" stroke={clr.stroke} strokeWidth={1} />
 
       {/* ── bottom outlet stub ── */}
       <line x1={cx} y1={y + H} x2={cx} y2={y + H + 10}
@@ -349,7 +301,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
   return (
     <div style={{
       background: "#ffffff",
-      padding: "16px 16px 0",
+      padding: "18px 18px 8px",
       borderRadius: 12,
       fontFamily: "'Inter','Segoe UI',sans-serif",
     }}>
@@ -366,8 +318,9 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           </marker>
         </defs>
 
+        <g transform="translate(0, 14)">
         {/* ── Outer section panel ── */}
-        <rect x={8} y={8} width={744} height={476} rx={14}
+        <rect x={8} y={8} width={744} height={376} rx={14}
           fill="#f8fafc" stroke="#e2e8f0" strokeWidth={1.2} />
 
         {/* ── Header row ── */}
@@ -397,9 +350,9 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         </text>
 
         {/* ── Process flow white inner panel ── */}
-        <rect x={18} y={102} width={720} height={270} rx={10}
+        <rect x={18} y={90} width={720} height={250} rx={10}
           fill="#ffffff" stroke="#e2e8f0" strokeWidth={1} />
-        <text x={30} y={118} fontSize={8} fill="#94a3b8"
+        <text x={30} y={100} fontSize={8} fill="#94a3b8"
           fontFamily="sans-serif" letterSpacing={0.5}>PROCESS FLOW</text>
 
         {/* ═══════════════════════════════════════════
@@ -415,7 +368,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         {/* Tank 1 */}
         <MixingTankM
           x={t1X} y={tankY}
-          label="MIXING" level={d.mixing_tank1_level}
+          label="SLURRY" level={d.mixing_tank1_level}
           waterLabel="Water" />
 
         {/* Pipe: Tank1 right → HEX1 left */}
@@ -466,7 +419,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         {/* Tank 2 */}
         <MixingTankM
           x={t2X} y={tankY}
-          label="MIXING" level={d.mixing_tank2_level}
+          label="INTERMEDIATE" level={d.mixing_tank2_level}
           waterLabel="Water" />
 
         {/* Pipe: Tank2 right → HEX4 left */}
@@ -513,37 +466,11 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         <text x={finalPipeEnd + 4} y={pipeY + 4}
           fontSize={8} fill="#3b82f6" fontFamily="sans-serif">out</text>
 
-        {/* ── Temperature Profile row ── */}
-        <rect x={18} y={374} width={664} height={52} rx={8}
-          fill="#f8fafc" stroke="#e2e8f0" strokeWidth={1} />
-        <text x={30} y={390} fontSize={8} fill="#94a3b8"
-          fontFamily="sans-serif" letterSpacing={0.5}>TEMPERATURE PROFILE</text>
-
-        {d.hex.map((h, i) => {
-          const c  = tempClr(h.temp_actual, HEX_SETPOINTS[i]);
-          const bx = 30 + i * 108;
-          return (
-            <g key={i}>
-              <rect x={bx} y={395} width={100} height={24} rx={5}
-                fill={c.fill} stroke={c.stroke} strokeWidth={1} />
-              <text x={bx + 50} y={403} textAnchor="middle"
-                fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">
-                HEX {i + 1} · sp {HEX_SETPOINTS[i]}°C
-              </text>
-              <text x={bx + 50} y={415} textAnchor="middle"
-                fontSize={10} fontWeight="700" fill={c.text}
-                fontFamily="'IBM Plex Mono',monospace">
-                {h.temp_actual.toFixed(1)}°C
-              </text>
-            </g>
-          );
-        })}
-
         {/* ── Output strip ── */}
-        <rect x={18} y={438} width={664} height={36} rx={8}
+        <rect x={18} y={400} width={664} height={42} rx={8}
           fill="#ffffff" stroke="#e2e8f0" strokeWidth={1.2} />
         {/* blue left accent */}
-        <rect x={18} y={438} width={4} height={36} rx={2} fill="#3b82f6" />
+        {/* <rect x={18} y={400} width={4} height={36} rx={2} fill="#3b82f6" /> */}
 
         {/* 4 KPI cells */}
         {([
@@ -572,26 +499,30 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
             c:     wasteClr,
           },
         ] as { label: string; value: string; sub: string; c: Clr }[]).map((kpi, i) => {
-          const cellX = 28 + i * 164;
+          const cellW = 160;
+          const cellX = 22 + i * cellW;
+          const labelY = 414;
+          const valueY = 428;
           return (
             <g key={i}>
               {/* subtle divider between cells */}
               {i > 0 && (
-                <line x1={cellX - 4} y1={444} x2={cellX - 4} y2={468}
+                <line x1={cellX} y1={408} x2={cellX} y2={432}
                   stroke="#e2e8f0" strokeWidth={1} />
               )}
-              <text x={cellX} y={450} fontSize={7.5} fill="#94a3b8"
+              <text x={cellX + 8} y={labelY} fontSize={7.5} fill="#94a3b8"
                 fontFamily="sans-serif" letterSpacing={0.3}>{kpi.label}</text>
-              <text x={cellX} y={465} fontSize={12} fontWeight="700"
+              <text x={cellX + 8} y={valueY} fontSize={12} fontWeight="700"
                 fill={kpi.c.text}
                 fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
               {kpi.sub && (
-                <text x={cellX + 90} y={465} fontSize={7.5} fill="#94a3b8"
+                <text x={cellX + 8} y={valueY + 10} fontSize={7} fill="#94a3b8"
                   fontFamily="sans-serif">{kpi.sub}</text>
               )}
             </g>
           );
         })}
+        </g>
       </svg>
     </div>
   );
