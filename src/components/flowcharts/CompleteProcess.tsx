@@ -430,7 +430,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <rect x={12} y={364} width={5} height={120} rx={3} fill="#3b82f6" />
 
         <text x={28} y={382} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          PROCESS SUMMARY — CALCULATED BY FASTAPI
+          PROCESS SUMMARY 
         </text>
         <line x1={28} y1={388} x2={1024} y2={388} stroke="#dbe2ea" strokeWidth={1} />
 
@@ -467,6 +467,45 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           </g>
         ))}
       </svg>
+
+      {/* TAB OUTPUT summary (numbers only) */}
+      <div style={{ marginTop: 18 }}>
+        <div style={{
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: 12,
+          padding: "14px 18px",
+        }}>
+          <div style={{
+            fontSize: 10,
+            color: "#0f172a",
+            fontWeight: 700,
+            letterSpacing: 1,
+            marginBottom: 8,
+          }}>
+            TAB OUTPUT
+          </div>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gap: 18,
+          }}>
+            {([
+              { label: "WORT % BRIX", value: "15.3%" },
+              { label: "WORT EXTRACTION %", value: "89.8%" },
+              { label: "ACTUAL OUTPUT (kg)", value: "27,528" },
+              { label: "TOTAL WASTAGE %", value: "3.29%" },
+            ]).map((kpi, i) => (
+              <div key={i}>
+                <div style={{ fontSize: 9, color: "#94a3b8", marginBottom: 4 }}>{kpi.label}</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  {kpi.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

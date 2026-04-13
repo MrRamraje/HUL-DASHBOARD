@@ -290,8 +290,6 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
             Center of conveyor: convX + convW/2 = 245
             Panel width: 200, so x = 245 + offset. But mixing tank is at TX=596.
             We position panel to the right of the tank, directly beside it. */}
-        <rect x={TX + 102} y={tankY - 4} width={198} height={226} rx={14}
-          fill="#ffffff" stroke="#dbe2ea" strokeWidth={1} />
         <text x={TX + 115} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
         <line x1={TX + 115} y1={tankY + 18} x2={TX + 292} y2={tankY + 18} stroke="#dbe2ea" strokeWidth={0.8} />
 
@@ -304,28 +302,14 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <text x={TX + 200} y={tankY + 74} textAnchor="end" fontSize={11}
           fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700">{d.mixing_tank_level}%</text>
 
-        <line x1={TX + 115} y1={tankY + 83} x2={TX + 292} y2={tankY + 83} stroke="#dbe2ea" strokeWidth={0.8} />
-
-        <text x={TX + 115} y={tankY + 100} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">FLOW RATE  act / tgt</text>
-        <text x={TX + 115} y={tankY + 116} fontSize={10} fill={flC.text} fontWeight="700">
-          {d.mixing_flow_rate.toLocaleString()} / {d.mixing_flow_target.toLocaleString()}
-        </text>
-        <text x={TX + 115} y={tankY + 128} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
-
-        <line x1={TX + 115} y1={tankY + 136} x2={TX + 292} y2={tankY + 136} stroke="#dbe2ea" strokeWidth={0.8} />
-
-        <text x={TX + 115} y={tankY + 152} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">% TS</text>
-        <text x={TX + 200} y={tankY + 152} textAnchor="end" fontSize={11} fill="#0369a1" fontWeight="700">{d.mixing_pct_ts.toFixed(1)}%</text>
-        <text x={TX + 115} y={tankY + 168} fontSize={8.5} fill="#7c3aed" fontWeight="600">
-          MB {d.mixing_pct_mb.toFixed(1)}%  WG {d.mixing_pct_wg.toFixed(1)}%  WF {d.mixing_pct_wf.toFixed(1)}%
-        </text>
+        
 
         {/* ── OUTPUT STRIP ── */}
         <rect x={12} y={490} width={1016} height={98} rx={14}
           fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.4} />
         <rect x={12} y={490} width={5} height={98} rx={3} fill="#3b82f6" />
         <text x={28} y={508} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          TAB OUTPUT — CALCULATED BY FASTAPI
+          TAB OUTPUT
         </text>
         <line x1={28} y1={514} x2={1024} y2={514} stroke="#dbe2ea" strokeWidth={1} />
 
