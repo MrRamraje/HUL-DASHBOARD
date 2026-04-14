@@ -135,6 +135,34 @@ function MiniBufferTank({ x, y }: { x: number; y: number }) {
   );
 }
 
+// ─── Mini Mill (roller style) ────────────────────────────────────────────────
+function MiniMill({ x, y, gap, current }: { x: number; y: number; gap: number; current: number }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={44} height={30} rx={4} fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1} />
+      <circle cx={x + 14} cy={y + 15} r={8.2} fill="#bfdbfe" stroke="#3b82f6" strokeWidth={1.2} />
+      <circle cx={x + 30} cy={y + 15} r={8.2} fill="#bfdbfe" stroke="#3b82f6" strokeWidth={1.2} />
+      <circle cx={x + 14} cy={y + 15} r={3.2} fill="#3b82f6" />
+      <circle cx={x + 30} cy={y + 15} r={3.2} fill="#3b82f6" />
+      <polygon
+        points={`${x + 14},${y + 30} ${x + 30},${y + 30} ${x + 26},${y + 42} ${x + 18},${y + 42}`}
+        fill="#e2e8f0"
+        stroke="#94a3b8"
+        strokeWidth={1}
+      />
+      <text x={x + 50} y={y + 6} fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">Gap</text>
+      <text x={x + 50} y={y + 20} fontSize={8.5} fill="#d97706" fontWeight="700" fontFamily="'IBM Plex Mono',monospace">
+        {gap.toFixed(2)} mm
+      </text>
+      <text x={x + 50} y={y + 31} fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
+      <circle cx={x + 50} cy={y + 38} r={1.8} fill="#ef4444" />
+      <text x={x + 56} y={y + 42} fontSize={8.5} fill="#1f2937" fontWeight="700" fontFamily="'IBM Plex Mono',monospace">
+        {current.toFixed(1)} A
+      </text>
+    </g>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mockData }) => {
   const [d, setD] = useState(data);
@@ -173,6 +201,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
 
   const outC = sc(d.total_bip_output, d.std_output);
   const MASH_Y_OFFSET = 16;
+  const RIGHT_SECTION_SHIFT = 36;
 
   return (
     <div style={{
@@ -238,10 +267,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <line x1={278} y1={122} x2={278} y2={164} stroke="#94a3b8" strokeWidth={2.5} />
 
         {/* mill on MB path */}
-        <rect x={262} y={142} width={32} height={20} rx={3}
-          fill="#eff6ff" stroke="#3b82f6" strokeWidth={1} />
-        <text x={278} y={155} textAnchor="middle" fontSize={7.5}
-          fill="#3b82f6" fontWeight="700">MILL</text>
+        <MiniMill x={252} y={136} gap={0.44} current={14.0} />
 
         {/* merge funnel */}
         <polygon points="120,164 200,164 188,184 132,184"
@@ -265,9 +291,16 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <text x={165} y={214} textAnchor="middle" fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">CONVEYOR FLOW</text>
         <text x={165} y={228} textAnchor="middle" fontSize={11} fill="#15803d" fontWeight="700">{d.conveyor_flow.toLocaleString()} kg/h</text>
 
-        {/* pipe right to mashing */}
-        <line x1={298} y1={193} x2={384} y2={193}
-          stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowCP)" />
+        {/* pipe right to mashing (single bend to mix tank inlet) */}
+        <polyline
+          points={`298,193 ${366 + RIGHT_SECTION_SHIFT},193 ${366 + RIGHT_SECTION_SHIFT},${99 + MASH_Y_OFFSET}`}
+          fill="none"
+          stroke="#3b82f6"
+          strokeWidth={2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          markerEnd="url(#arrowCP)"
+        />
 
         {/* ── Water flow inline label ── */}
         <text x={24} y={258} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">WATER FLOW</text>
@@ -279,8 +312,9 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <rect x={384} y={32} width={616} height={316} rx={16}
           fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
 
-        <text x={561} y={60} textAnchor="middle" fontSize={8.5} fill="#3b82f6"
-          fontWeight="700" letterSpacing={1}>MASHING SECTION</text>
+        <g transform={`translate(${RIGHT_SECTION_SHIFT}, 0)`}>
+          <text x={561} y={60} textAnchor="middle" fontSize={8.5} fill="#3b82f6"
+            fontWeight="700" letterSpacing={1}>MASHING SECTION</text>
 
         {/* water input arrows */}
         <line x1={384} y1={44 + MASH_Y_OFFSET} x2={384} y2={72 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
@@ -338,9 +372,6 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           fill={d.buffer_level < 40 ? "#d97706" : "#16a34a"} fontWeight="700"
           fontFamily="'IBM Plex Mono',monospace">{d.buffer_level}%</text>
 
-        <text x={596} y={252} textAnchor="middle" fontSize={8.5} fill="#7c3aed"
-          fontWeight="700" letterSpacing={1}>MALTED DEXTRON SYSTEM</text>
-
         {/* 3 centrifuge columns */}
         {[
           { cx: 380, label: "WW2",  pct: d.ww2_pct  },
@@ -361,6 +392,30 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
               <text x={unit.cx + 22} y={273} textAnchor="middle"
                 fontSize={7.5} fill={tc.text} fontWeight="700"
                 fontFamily="'IBM Plex Mono',monospace">{unit.pct.toFixed(1)}%</text>
+              {i === 2 && (
+                <>
+                  <line
+                    x1={unit.cx + 44}
+                    y1={265}
+                    x2={unit.cx + 66}
+                    y2={265}
+                    stroke="#3b82f6"
+                    strokeWidth={1.6}
+                    markerEnd="url(#arrowCP)"
+                  />
+                  <text
+                    x={unit.cx + 70}
+                    y={268}
+                    textAnchor="start"
+                    fontSize={8.5}
+                    fill="#7c3aed"
+                    fontWeight="700"
+                    letterSpacing={1}
+                  >
+                    MALTED DEXTRON SYSTEM
+                  </text>
+                </>
+              )}
 
               {/* centrifuge */}
               <MiniCentrifuge x={unit.cx} y={286} />
@@ -398,9 +453,10 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <text x={808} y={312} textAnchor="middle" fontSize={9}
           fill="#3b82f6" fontWeight="700">P</text>
 
-        {/* pipe: buffer → pump → centrifuge row */}
-        <line x1={870} y1={308} x2={818} y2={308} stroke="#3b82f6" strokeWidth={1.5} />
-        <line x1={424} y1={308} x2={798} y2={308} stroke="#3b82f6" strokeWidth={1.5} />
+          {/* pipe: buffer → pump → centrifuge row */}
+          <line x1={870} y1={308} x2={818} y2={308} stroke="#3b82f6" strokeWidth={1.5} />
+          <line x1={424} y1={308} x2={798} y2={308} stroke="#3b82f6" strokeWidth={1.5} />
+        </g>
 
         {/* ══════════════════════════════════════════════
             OUTPUT KPI STRIP — Fixed layout, no overflow

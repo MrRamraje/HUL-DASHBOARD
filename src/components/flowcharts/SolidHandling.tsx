@@ -116,7 +116,7 @@ function MixingTank({ x, y, level }: { x: number; y: number; level: number }) {
   const lc = level < 40 ? "#ef4444" : level < 60 ? "#f59e0b" : "#22c55e";
   return (
     <g>
-      <line x1={cx - 16} y1={y - 30} x2={cx - 16} y2={y}
+      <line x1={cx} y1={y - 34} x2={cx} y2={y}
         stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSH)" />
       <ellipse cx={cx} cy={y} rx={W / 2} ry={9} fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1.2} />
       <rect x={x} y={y} width={W} height={H} fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.2} />
@@ -132,7 +132,7 @@ function MixingTank({ x, y, level }: { x: number; y: number; level: number }) {
         <line key={i} x1={x + lx} y1={y + H + 9} x2={x + lx} y2={y + H + 22}
           stroke="#94a3b8" strokeWidth={2.5} />
       ))}
-      <line x1={x + W + 12} y1={y + H / 2 + 10} x2={x + W + 36} y2={y + H / 2 + 10}
+      <line x1={x + W + 12} y1={y + 28} x2={x + W + 36} y2={y + 28}
         stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowSH)" />
     </g>
   );
@@ -179,11 +179,11 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
   const convX = 50;    // conveyor left x
   const convY = 412;   // conveyor top y
   const convW = 390;   // conveyor width
-  const TX = 755;      // mixing tank x (centered in right panel)
-  const tankY = 260;   // mixing tank y
-  const mixInfoX = TX - 130;
-  const mixInfoValueX = TX - 20;
-  const connectorMidX = (convX + convW + (TX + 30)) / 2;
+  const tankX = 700;   // moved left for a centered-right balance
+  const tankY = 180;   // moved upward toward middle
+  const mixInfoX = 126;
+  const mixInfoValueX = 220;
+  const connectorMidX = (convX + convW + tankX) / 2;
 
   // Silo center x values
   const wgCX = 96,  wfCX = 236, mbCX = 376;
@@ -221,8 +221,8 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <line x1={wgCX} y1={SY + 192} x2={wgCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
         {/* inline value */}
         <text x={wgCX + 32} y={SY + 184} fontSize={12} fill={wgC.text} fontWeight="700">{d.wg_actual_flow.toFixed(0)}</text>
-        <text x={wgCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
-        <text x={wgCX + 32} y={SY + 208} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">tgt {d.wg_target_flow.toLocaleString()}</text>
+        <text x={wgCX + 32} y={SY + 196} fontSize={9.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">kg/h</text>
+        <text x={wgCX + 32} y={SY + 210} fontSize={9.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">tgt {d.wg_target_flow.toLocaleString()}</text>
 
         {/* ════════════════════════════════════════════════
             SILO 2 — WF
@@ -233,8 +233,8 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <line x1={wfCX} y1={SY + 192} x2={wfCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
         {/* inline values */}
         <text x={wfCX + 32} y={SY + 184} fontSize={12} fill={wfC.text} fontWeight="700">{d.wf_actual_flow.toFixed(0)}</text>
-        <text x={wfCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
-        <text x={wfCX + 32} y={SY + 208} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">tgt {d.wf_target_flow}</text>
+        <text x={wfCX + 32} y={SY + 196} fontSize={9.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">kg/h</text>
+        <text x={wfCX + 32} y={SY + 210} fontSize={9.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">tgt {d.wf_target_flow}</text>
 
         {/* ════════════════════════════════════════════════
             SILO 3 — Malted Barley
@@ -275,32 +275,33 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
           MB {d.conveyor_pct_mb.toFixed(1)}% / WG {d.conveyor_pct_wg.toFixed(1)}% / WF {d.conveyor_pct_wf.toFixed(1)}%
         </text>
 
-        {/* ── Pipe: conveyor → mixing tank ── */}
-        <line x1={convX + convW} y1={convY + 14} x2={TX + 30} y2={convY + 14}
+        {/* ── Pipe: conveyor → mixing tank (connect from left side) ── */}
+        <line x1={convX + convW} y1={convY + 14} x2={tankX - 32} y2={convY + 14}
           stroke="#3b82f6" strokeWidth={2.5} />
-        <line x1={TX + 30} y1={convY + 14} x2={TX + 30} y2={tankY + 18}
+        <line x1={tankX - 32} y1={convY + 14} x2={tankX - 32} y2={tankY + 56}
+          stroke="#3b82f6" strokeWidth={2.5} />
+        <line x1={tankX - 32} y1={tankY + 56} x2={tankX} y2={tankY + 56}
           stroke="#3b82f6" strokeWidth={2.5} markerEnd="url(#arrowSH)" />
 
-        {/* ── Mixing Tank ── */}
-        <MixingTank x={TX} y={tankY} level={d.mixing_tank_level} />
+        {/* ── Mixing block (tank + adjacent labels/values move together) ── */}
+        <g transform={`translate(${tankX}, ${tankY})`}>
+          <MixingTank x={0} y={0} level={d.mixing_tank_level} />
 
-        {/* ── Water / weak wort label above mixing tank ── */}
-        <text x={TX + 45} y={tankY - 14} textAnchor="middle" fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
+          {/* Water / weak wort labels */}
+          <text x={45} y={-42} textAnchor="middle" fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
 
-        {/* ── Inline water/weak wort metrics (no outer card) ── */}
-        <text x={mixInfoX} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
+          {/* RPM, Current, Tank Flow - bottom-right of tank */}
+          <text x={mixInfoX} y={102} fontSize={8.5} fill="#000000" fontWeight="700" fontFamily="sans-serif">RPM</text>
+          <text x={mixInfoValueX} y={102} textAnchor="end" fontSize={11} fill="#000000" fontWeight="700">{d.mixing_rpm}</text>
+          <text x={mixInfoX} y={120} fontSize={8.5} fill="#000000" fontWeight="700" fontFamily="sans-serif">Current</text>
+          <text x={mixInfoValueX} y={120} textAnchor="end" fontSize={11} fill="#000000" fontWeight="700">{d.mixing_current.toFixed(1)} A</text>
+          <text x={mixInfoX} y={138} fontSize={8.5} fill="#000000" fontWeight="700" fontFamily="sans-serif">Tank Flow</text>
+          <text x={mixInfoValueX + 30} y={138} textAnchor="end" fontSize={11}
+            fill="#000000" fontWeight="700">{d.mixing_flow_rate.toLocaleString()} kg/h</text>
 
-        {/* RPM, Current, Level — inline */}
-        <text x={mixInfoX} y={tankY + 38} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">RPM</text>
-        <text x={mixInfoValueX} y={tankY + 38} textAnchor="end" fontSize={11} fill="#059669" fontWeight="700">{d.mixing_rpm}</text>
-        <text x={mixInfoX} y={tankY + 56} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
-        <text x={mixInfoValueX} y={tankY + 56} textAnchor="end" fontSize={11} fill="#374151" fontWeight="700">{d.mixing_current.toFixed(1)} A</text>
-        <text x={mixInfoX} y={tankY + 74} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Tank Level</text>
-        <text x={mixInfoValueX} y={tankY + 74} textAnchor="end" fontSize={11}
-          fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700">{d.mixing_tank_level}%</text>
-
-        {/* outlet direction */}
-        <text x={TX + 126} y={tankY + 70} fontSize={8.5} fill="#3b82f6" fontWeight="700" fontFamily="sans-serif">To Mashing Section</text>
+          {/* outlet direction - inline with top-right outlet arrow */}
+          <text x={130} y={28} dominantBaseline="middle" fontSize={8.5} fill="#000000" fontWeight="700" fontFamily="sans-serif">To Mashing Section</text>
+        </g>
 
         
 
@@ -314,15 +315,14 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <line x1={28} y1={514} x2={1024} y2={514} stroke="#dbe2ea" strokeWidth={1} />
 
         {([
-          { label: "BOM OUTPUT",         value: d.output_bom.toFixed(2),              color: "#0369a1" },
-          { label: "STD OUTPUT (kg)",    value: d.output_std_kg.toLocaleString(),     color: "#15803d" },
-          { label: "ACTUAL OUTPUT (kg)", value: d.output_actual_kg.toLocaleString(),  color: sc(d.output_actual_kg, d.output_std_kg).text },
-          { label: "WASTAGE %",          value: d.output_wastage_pct.toFixed(2) + "%", color: waC.text },
+          { label: "SET POINT",       value: d.output_std_kg.toLocaleString(),    color: "#0f172a" },
+          { label: "ACTUAL VALUE",    value: d.output_actual_kg.toLocaleString(), color: sc(d.output_actual_kg, d.output_std_kg).text },
+          { label: "PREDICTED VALUE", value: d.output_bom.toFixed(2),             color: "#0369a1" },
         ] as { label: string; value: string; color: string }[]).map((kpi, i) => (
           <g key={i}>
-            {i > 0 && <line x1={30 + i * 254} y1={522} x2={30 + i * 254} y2={578} stroke="#e2e8f0" strokeWidth={1} />}
-            <text x={36 + i * 254} y={532} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
-            <text x={36 + i * 254} y={562} fontSize={22} fontWeight="700" fill={kpi.color} fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
+            {i > 0 && <line x1={30 + i * 338} y1={522} x2={30 + i * 338} y2={578} stroke="#e2e8f0" strokeWidth={1} />}
+            <text x={36 + i * 338} y={532} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
+            <text x={36 + i * 338} y={562} fontSize={22} fontWeight="700" fill={kpi.color} fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
           </g>
         ))}
       </svg>

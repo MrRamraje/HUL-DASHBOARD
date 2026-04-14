@@ -155,6 +155,47 @@ function HopperTank({
   );
 }
 
+// ─── Stirred Wash Tank (for Wash Tank 1/2) ───────────────────────────────────
+function StirredWashTank({ x, y, w = 74, level }: { x: number; y: number; w?: number; level: number }) {
+  const topH = 28;
+  const bodyH = 46;
+  const H = topH + bodyH;
+  const cx = x + w / 2;
+  const fluidTop = y + H - Math.max(4, (level / 100) * bodyH);
+  const fluidColor = level < 40 ? "#fca5a5" : level < 60 ? "#fde68a" : "#bfdbfe";
+
+  return (
+    <g>
+      {/* tank body */}
+      <ellipse cx={cx} cy={y + topH} rx={w / 2} ry={8} fill="#e5e7eb" stroke="#64748b" strokeWidth={1.2} />
+      <rect x={x} y={y + topH} width={w} height={bodyH} fill="#f8fafc" stroke="#64748b" strokeWidth={1.2} />
+      <ellipse cx={cx} cy={y + H} rx={w / 2} ry={8} fill="#e2e8f0" stroke="#64748b" strokeWidth={1.2} />
+
+      {/* fluid */}
+      <rect x={x + 1} y={fluidTop} width={w - 2} height={y + H - fluidTop} fill={fluidColor} opacity={0.34} />
+
+      {/* mixer shaft */}
+      <rect x={cx - 2.2} y={y - 18} width={4.4} height={62} rx={2} fill="#64748b" />
+
+      {/* impeller hub + blades */}
+      <circle cx={cx} cy={y + topH + 30} r={4.2} fill="#475569" />
+      <rect x={cx - 21} y={y + topH + 28} width={42} height={4} fill="#64748b" opacity={0.92} />
+      <polygon points={`${cx - 20},${y + topH + 27} ${cx - 33},${y + topH + 23} ${cx - 33},${y + topH + 33}`} fill="#475569" />
+      <polygon points={`${cx + 20},${y + topH + 27} ${cx + 33},${y + topH + 23} ${cx + 33},${y + topH + 33}`} fill="#475569" />
+
+      {/* mixing style lines */}
+      <path d={`M${cx - 17},${y + topH + 36} Q${cx - 4},${y + topH + 44} ${cx + 12},${y + topH + 37}`}
+        fill="none" stroke="#60a5fa" strokeWidth={1.4} opacity={0.9} />
+      <path d={`M${cx - 14},${y + topH + 42} Q${cx + 1},${y + topH + 50} ${cx + 16},${y + topH + 42}`}
+        fill="none" stroke="#60a5fa" strokeWidth={1.2} opacity={0.75} />
+
+      {/* side level indicator */}
+      <rect x={x + w + 3} y={y + topH + 2} width={5} height={bodyH - 4} rx={2} fill="#f1f5f9" stroke="#dbe2ea" strokeWidth={0.8} />
+      <rect x={x + w + 4} y={fluidTop} width={3} height={y + H - fluidTop} rx={1} fill="#22c55e" opacity={0.9} />
+    </g>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockData }) => {
   const [d, setD] = useState(data);
@@ -307,8 +348,12 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
                 stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)"
                 style={{ position: "absolute", left: "300px", display: "flex", flexWrap: "wrap" }} />
 
-              {/* ── Wash tank ── */}
-              <HopperTank x={wtx} y={wtY} w={74} level={wu.level_pct} neutral />
+              {/* ── Wash tank visuals: use stirred tanks for Wash Tank 2/1 ── */}
+              {col === 1 || col === 2 ? (
+                <StirredWashTank x={wtx} y={wtY - 10} w={74} level={wu.level_pct} />
+              ) : (
+                <HopperTank x={wtx} y={wtY} w={74} level={wu.level_pct} neutral />
+              )}
 
               {/* wash tank inline label */}
               <text x={wtx + 37} y={wtY + 86} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">{WASH_TANK_LABELS[col]}</text>
@@ -372,6 +417,44 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
             </g>
           );
         })}
+
+        {/* ── New merged upward arrow from WORT2 & WORT1 (upper-left) ── */}
+        <line
+          x1={colCX[0]}
+          y1={vesY - 4}
+          x2={colCX[0]}
+          y2={vesY - 28}
+          stroke="#3b82f6"
+          strokeWidth={2}
+        />
+        <line
+          x1={colCX[1]}
+          y1={vesY - 4}
+          x2={colCX[1]}
+          y2={vesY - 28}
+          stroke="#3b82f6"
+          strokeWidth={2}
+        />
+        <line
+          x1={colCX[0]}
+          y1={vesY - 28}
+          x2={colCX[1]}
+          y2={vesY - 28}
+          stroke="#3b82f6"
+          strokeWidth={2}
+        />
+        <line
+          x1={(colCX[0] + colCX[1]) / 2}
+          y1={vesY - 28}
+          x2={(colCX[0] + colCX[1]) / 2}
+          y2={vesY - 56}
+          stroke="#3b82f6"
+          strokeWidth={2}
+          markerEnd="url(#arrowEX)"
+        />
+        <text x={(colCX[0] + colCX[1]) / 2} y={vesY - 62} textAnchor="middle" fontSize={9} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
+          To Slurry Tank
+        </text>
 
         {/* ══════════════════════════════════════════════
             BUFFER TANK (right side)
