@@ -221,7 +221,8 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <line x1={wgCX} y1={SY + 192} x2={wgCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
         {/* inline value */}
         <text x={wgCX + 32} y={SY + 184} fontSize={12} fill={wgC.text} fontWeight="700">{d.wg_actual_flow.toFixed(0)}</text>
-        <text x={wgCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h  tgt {d.wg_target_flow.toLocaleString()}</text>
+        <text x={wgCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
+        <text x={wgCX + 32} y={SY + 208} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">tgt {d.wg_target_flow.toLocaleString()}</text>
 
         {/* ════════════════════════════════════════════════
             SILO 2 — WF
@@ -232,7 +233,8 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <line x1={wfCX} y1={SY + 192} x2={wfCX} y2={convY} stroke="#94a3b8" strokeWidth={3} />
         {/* inline values */}
         <text x={wfCX + 32} y={SY + 184} fontSize={12} fill={wfC.text} fontWeight="700">{d.wf_actual_flow.toFixed(0)}</text>
-        <text x={wfCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h  tgt {d.wf_target_flow}</text>
+        <text x={wfCX + 32} y={SY + 196} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
+        <text x={wfCX + 32} y={SY + 208} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">tgt {d.wf_target_flow}</text>
 
         {/* ════════════════════════════════════════════════
             SILO 3 — Malted Barley
@@ -282,6 +284,9 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         {/* ── Mixing Tank ── */}
         <MixingTank x={TX} y={tankY} level={d.mixing_tank_level} />
 
+        {/* ── Water / weak wort label above mixing tank ── */}
+        <text x={TX + 45} y={tankY - 14} textAnchor="middle" fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
+
         {/* ── Inline water/weak wort metrics (no outer card) ── */}
         <text x={mixInfoX} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
 
@@ -293,6 +298,9 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <text x={mixInfoX} y={tankY + 74} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Tank Level</text>
         <text x={mixInfoValueX} y={tankY + 74} textAnchor="end" fontSize={11}
           fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700">{d.mixing_tank_level}%</text>
+
+        {/* outlet direction */}
+        <text x={TX + 126} y={tankY + 70} fontSize={8.5} fill="#3b82f6" fontWeight="700" fontFamily="sans-serif">To Mashing Section</text>
 
         
 
