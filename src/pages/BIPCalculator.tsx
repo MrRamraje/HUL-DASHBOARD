@@ -139,7 +139,7 @@ const BIPCalculator: React.FC = () => {
   const [wg,            setWg]           = useState('119.13');
   const [isp,           setIsp]          = useState('24.03');
   const [inputTypeValue,setInputTypeValue]= useState('1.13');
-  const [mashingHour,   setMashingHour]  = useState('');
+  const [mashingHour,   setMashingHour]  = useState('10');
   const [sdFactor,      setSdFactor]     = useState('0.65477'); // Bug 5 fix: was ''
   const [productType,   setProductType]  = useState(PRODUCT_TYPES[0]);
 
@@ -187,10 +187,11 @@ const BIPCalculator: React.FC = () => {
       return sum + (Number.isFinite(n) ? n : 0);
     }, 0);
   }, [results]);
-
-  const stdOutput     = 1000; // Placeholder — replace when formula is known
-  const actualOutput  = totalBIP;
-  const wastage       = stdOutput - actualOutput;
+  const mashingHourNum = Number(mashingHour) || 0;
+  const stdOutput     = bomOutput * mashingHourNum; // Placeholder — replace when formula is known
+  const actualOutput  = bomOutput * totalBIP;
+  const wastageRaw    = stdOutput - actualOutput;
+  const wastage       = Math.max(wastageRaw, 0);
   const wastagePercent= stdOutput > 0 ? (wastage / stdOutput) * 100 : 0;
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
@@ -304,6 +305,7 @@ const BIPCalculator: React.FC = () => {
                 { label: 'MB',  value: mb,  setter: setMb,  placeholder: '1014.3'  },
                 { label: 'WG',  value: wg,  setter: setWg,  placeholder: '119.13'  },
                 { label: 'ISP', value: isp, setter: setIsp, placeholder: '24.03'   },
+                { label: 'Mahing Hour' ,value :mashingHour, setter: setMashingHour, placeholder: '10'}
               ] as const).map(({ label, value, setter, placeholder }) => (
                 <label key={label} className="block">
                   <span className="text-xs font-medium text-slate-600">{label}</span>
@@ -331,7 +333,9 @@ const BIPCalculator: React.FC = () => {
               </label>
 
               <label className="block">
-                <span className="text-xs font-medium text-slate-600">Mashing Hour</span>
+                <span className="text-xs font-medium text-slate-600">
+                
+                </span>
                 <input
                   type="number"
                   step="any"
