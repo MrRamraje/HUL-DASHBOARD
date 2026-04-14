@@ -172,6 +172,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
     : { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" };
 
   const outC = sc(d.total_bip_output, d.std_output);
+  const MASH_Y_OFFSET = 16;
 
   return (
     <div style={{
@@ -203,7 +204,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         {/* ══════════════════════════════════════════════
             LEFT BOX — SOLID DISPENSING
         ══════════════════════════════════════════════ */}
-        <rect x={12} y={32} width={336} height={316} rx={16}
+        <rect x={12} y={32} width={372} height={316} rx={16}
           fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
         <text x={180} y={50} textAnchor="middle" fontSize={9} fill="#64748b"
           fontWeight="700" letterSpacing={1}>SOLID DISPENSING</text>
@@ -265,7 +266,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <text x={165} y={228} textAnchor="middle" fontSize={11} fill="#15803d" fontWeight="700">{d.conveyor_flow.toLocaleString()} kg/h</text>
 
         {/* pipe right to mashing */}
-        <line x1={298} y1={193} x2={352} y2={193}
+        <line x1={298} y1={193} x2={384} y2={193}
           stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowCP)" />
 
         {/* ── Water flow inline label ── */}
@@ -275,64 +276,61 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         {/* ══════════════════════════════════════════════
             RIGHT BOX — MASHING + MALTED DEXTRON
         ══════════════════════════════════════════════ */}
-        <rect x={352} y={32} width={676} height={316} rx={16}
+        <rect x={384} y={32} width={616} height={316} rx={16}
           fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
 
-        {/* ─ MASHING sub-box — no fill, just a subtle border ─ */}
-        <rect x={364} y={44} width={394} height={188} rx={12}
-          fill="none" stroke="#dbe2ea" strokeWidth={1} />
         <text x={561} y={60} textAnchor="middle" fontSize={8.5} fill="#3b82f6"
           fontWeight="700" letterSpacing={1}>MASHING SECTION</text>
 
         {/* water input arrows */}
-        <line x1={384} y1={44} x2={384} y2={72} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
-        <text x={392} y={56} fontSize={8} fill="#3b82f6" fontFamily="sans-serif">water</text>
-        <line x1={636} y1={44} x2={636} y2={72} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
+        <line x1={384} y1={44 + MASH_Y_OFFSET} x2={384} y2={72 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
+        <text x={392} y={56 + MASH_Y_OFFSET} fontSize={8} fill="#3b82f6" fontFamily="sans-serif">water</text>
+        <line x1={636} y1={44 + MASH_Y_OFFSET} x2={636} y2={72 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
 
         {/* steam dashed */}
-        <line x1={512} y1={44} x2={512} y2={68} stroke="#94a3b8" strokeWidth={1} strokeDasharray="3 2" />
-        <text x={520} y={55} fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">steam</text>
+        <line x1={512} y1={44 + MASH_Y_OFFSET} x2={512} y2={68 + MASH_Y_OFFSET} stroke="#94a3b8" strokeWidth={1} strokeDasharray="3 2" />
+        <text x={520} y={55 + MASH_Y_OFFSET} fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">steam</text>
 
         {/* Mixing Tank 1 */}
-        <MiniMixTank x={366} y={72} level={d.mixing1_level} />
+        <MiniMixTank x={366} y={72 + MASH_Y_OFFSET} level={d.mixing1_level} />
 
         {/* pipe: tank1 → HEX row 1 */}
-        <line x1={422} y1={99} x2={442} y2={99} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={422} y1={99 + MASH_Y_OFFSET} x2={442} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* HEX row 1: 60°, 64°, 74° */}
         {[0,1,2].map(i => (
           <g key={i}>
-            <MiniHex x={442 + i*42} y={72} temp={[60,64,74][i]} actual={d.hex_temps[i]} />
+            <MiniHex x={442 + i*42} y={72 + MASH_Y_OFFSET} temp={[60,64,74][i]} actual={d.hex_temps[i]} />
             {i < 2 && (
-              <line x1={474 + i*42} y1={99} x2={484 + i*42} y2={99}
+              <line x1={474 + i*42} y1={99 + MASH_Y_OFFSET} x2={484 + i*42} y2={99 + MASH_Y_OFFSET}
                 stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
             )}
           </g>
         ))}
 
         {/* pipe → mixing tank 2 */}
-        <line x1={570} y1={99} x2={606} y2={99} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={570} y1={99 + MASH_Y_OFFSET} x2={606} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* Mixing Tank 2 */}
-        <MiniMixTank x={606} y={72} level={d.mixing2_level} />
+        <MiniMixTank x={606} y={72 + MASH_Y_OFFSET} level={d.mixing2_level} />
 
         {/* pipe: tank2 → HEX row 2 */}
-        <line x1={662} y1={99} x2={682} y2={99} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={662} y1={99 + MASH_Y_OFFSET} x2={682} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* HEX row 2: 74°, 74°, 80° */}
         {[3,4,5].map(i => (
           <g key={i}>
-            <MiniHex x={682 + (i-3)*42} y={72} temp={[74,74,80][i-3]} actual={d.hex_temps[i]} />
+            <MiniHex x={682 + (i-3)*42} y={72 + MASH_Y_OFFSET} temp={[74,74,80][i-3]} actual={d.hex_temps[i]} />
             {i < 5 && (
-              <line x1={714 + (i-3)*42} y1={99} x2={724 + (i-3)*42} y2={99}
+              <line x1={714 + (i-3)*42} y1={99 + MASH_Y_OFFSET} x2={724 + (i-3)*42} y2={99 + MASH_Y_OFFSET}
                 stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
             )}
           </g>
         ))}
 
         {/* pipe → Buffer tank routing */}
-        <line x1={808} y1={99} x2={870} y2={99} stroke="#3b82f6" strokeWidth={1.8} />
-        <line x1={870} y1={99} x2={870} y2={256} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={808} y1={99 + MASH_Y_OFFSET} x2={870} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} />
+        <line x1={870} y1={99 + MASH_Y_OFFSET} x2={870} y2={256} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* Buffer Tank */}
         <MiniBufferTank x={846} y={258} />
@@ -340,15 +338,8 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           fill={d.buffer_level < 40 ? "#d97706" : "#16a34a"} fontWeight="700"
           fontFamily="'IBM Plex Mono',monospace">{d.buffer_level}%</text>
 
-        {/* ─ MALTED DEXTRON sub-box — no fill ─ */}
-        <rect x={364} y={250} width={464} height={90} rx={12}
-          fill="none" stroke="#dbe2ea" strokeWidth={1} />
-        <text x={596} y={265} textAnchor="middle" fontSize={8.5} fill="#7c3aed"
+        <text x={596} y={252} textAnchor="middle" fontSize={8.5} fill="#7c3aed"
           fontWeight="700" letterSpacing={1}>MALTED DEXTRON SYSTEM</text>
-
-        {/* feed line buffer → system */}
-        <line x1={844} y1={270} x2={600} y2={270}
-          stroke="#7c3aed" strokeWidth={1.5} strokeDasharray="4 3" markerEnd="url(#arrowCP)" />
 
         {/* 3 centrifuge columns */}
         {[
@@ -457,46 +448,6 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           </g>
         ))}
       </svg>
-
-      {/* TAB OUTPUT summary (numbers only) */}
-      <div style={{ marginTop: 18 }}>
-        <div style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: 12,
-          padding: "16px 18px",
-          boxShadow: "0 4px 14px rgba(15,23,42,0.04)",
-        }}>
-          <div style={{
-            fontSize: 10,
-            color: "#0f172a",
-            fontWeight: 700,
-            letterSpacing: 1,
-            marginBottom: 8,
-          }}>
-            TAB OUTPUT
-          </div>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-            gap: 18,
-          }}>
-            {([
-              { label: "WORT % BRIX", value: "15.3%" },
-              { label: "WORT EXTRACTION %", value: "89.8%" },
-              { label: "ACTUAL OUTPUT (kg)", value: "27,528" },
-              { label: "TOTAL WASTAGE %", value: "3.29%" },
-            ]).map((kpi, i) => (
-              <div key={i}>
-                <div style={{ fontSize: 9, color: "#94a3b8", marginBottom: 4 }}>{kpi.label}</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {kpi.value}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

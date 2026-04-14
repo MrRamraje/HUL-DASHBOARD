@@ -31,9 +31,6 @@ const Machines: React.FC = () => {
         <h2 className="text-xl font-bold text-slate-900">
           Equipment Wise BIP Calculation – Live
         </h2>
-        <p className="text-slate-500 text-sm mt-1">
-          Real-time process architecture with live sensor values &amp; equipment monitoring
-        </p>
       </div>
 
       {/* ── Sub-tabs (same visual style as before) ── */}
