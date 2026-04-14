@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import StatusBadge from '../components/StatusBadge';
 import CompleteProcess from '../components/flowcharts/CompleteProcess';
 import SolidHandling from '../components/flowcharts/SolidHandling';
 import MashingSection from '../components/flowcharts/MashingSection';
@@ -11,19 +10,12 @@ import ExtractionSection from '../components/flowcharts/ExtractionSection';
 // ─────────────────────────────────────────────
 const TABS = [
   { id: 'main',    label: 'Complete Process'   },
-  { id: 'solid',   label: 'Solid Handling'     },
+  { id: 'solid',   label: 'Solid Dispensing'   },
   { id: 'mashing', label: 'Mashing Section'    },
   { id: 'extract', label: 'Extraction Section' },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
-
-const TAB_DESCRIPTIONS: Record<TabId, string> = {
-  main:    'High level flowchart for waste monitoring and control.',
-  solid:   'Solid handling section flowchart showing material handling and waste separation.',
-  mashing: 'Mashing section flowchart with process steps, temperature control, and throughput.',
-  extract: 'Extraction section flowchart for product recovery and waste minimization.',
-};
 
 // ─────────────────────────────────────────────
 // Main component — replaces old Machines.tsx
@@ -61,25 +53,10 @@ const Machines: React.FC = () => {
         ))}
       </div>
 
-      {/* ── Card wrapper (same Card + StatusBadge pattern as before) ── */}
+      {/* ── Card wrapper ── */}
       <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-
-        {/* Card header */}
-        <div className="flex flex-col gap-4 border-b border-slate-200 bg-slate-50/70 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h3 className="text-base font-semibold text-slate-900">
-              {TABS.find(t => t.id === activeTab)?.label}
-            </h3>
-            <p className="text-sm text-slate-500 mt-0.5">
-              {TAB_DESCRIPTIONS[activeTab]}
-            </p>
-          </div>
-          {/* Re-use your existing StatusBadge — no change needed there */}
-          <StatusBadge status="Live" />
-        </div>
-
         {/* ── SVG flowchart area (replaces the old <img> tag) ── */}
-        <div className="overflow-x-auto bg-gradient-to-b from-slate-50 via-white to-slate-50 px-3 py-4 sm:px-4 lg:px-6">
+        <div className="overflow-x-auto bg-gradient-to-b from-slate-50 via-white to-slate-50 px-3 py-5 sm:px-4 lg:px-6">
           <div className="min-w-[980px]">
             {activeTab === 'main'    && <CompleteProcess />}
             {activeTab === 'solid'   && <SolidHandling />}

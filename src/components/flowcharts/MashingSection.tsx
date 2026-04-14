@@ -58,9 +58,9 @@ function tempClr(actual: number, setpoint: number): Clr {
 // ─── Mixing Tank ──────────────────────────────────────────────────────────────
 // W=80  H=100  inlet arrow above, level bar on right, legs below
 function MixingTankM({
-  x, y, label, level, waterLabel,
+  x, y, label, level, waterLabel, waterFlowLabel,
 }: {
-  x: number; y: number; label: string; level: number; waterLabel?: string;
+  x: number; y: number; label: string; level: number; waterLabel?: string; waterFlowLabel?: string;
 }) {
   const W = 80, H = 100;
   const cx = x + W / 2;
@@ -71,9 +71,13 @@ function MixingTankM({
   return (
     <g>
       {/* water inlet label + arrow */}
+      {waterFlowLabel && (
+        <text x={cx} y={y - 42} textAnchor="middle"
+          fontSize={9} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">{waterFlowLabel}</text>
+      )}
       {waterLabel && (
-        <text x={cx} y={y - 36} textAnchor="middle"
-          fontSize={8} fill="#3b82f6" fontFamily="sans-serif">{waterLabel}</text>
+        <text x={cx} y={y - 30} textAnchor="middle"
+          fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">{waterLabel}</text>
       )}
       <line x1={cx} y1={y - 24} x2={cx} y2={y - 1}
         stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowMash)" />
@@ -115,7 +119,7 @@ function MixingTankM({
         fontSize={8.5} fill="#64748b" fontFamily="sans-serif">TANK</text>
 
       {/* level % below tank */}
-      <text x={cx} y={y + H + 22} textAnchor="middle"
+      <text x={cx} y={y + H + 36} textAnchor="middle"
         fontSize={9.5} fill={lc} fontWeight="700"
         fontFamily="'IBM Plex Mono',monospace">{level}%</text>
 
@@ -167,7 +171,8 @@ function HeatExchangerSVG({
       <line
         x1={cx - stubOffset} y1={y - stubLen}
         x2={cx - stubOffset} y2={y}
-        stroke="#94a3b8" strokeWidth={1.4} strokeLinecap="round" />
+        stroke="#94a3b8" strokeWidth={1.4} strokeLinecap="round"
+        markerEnd="url(#arrowGrayMash)" />
       {/* right stub: fluid OUT (up arrow) */}
       <line
         x1={cx + stubOffset} y1={y}
@@ -199,8 +204,8 @@ function HeatExchangerSVG({
         {actualTemp.toFixed(1)}°C
       </text>
       <text x={cx} y={y + H + 35} textAnchor="middle"
-        fontSize={8} fill="#94a3b8" fontFamily="monospace">
-        sp {temp}°C
+        fontSize={8.5} fill="#2563eb" fontWeight="600" fontFamily="'IBM Plex Mono',monospace">
+        {temp}°C
       </text>
     </g>
   );
@@ -239,25 +244,6 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
 
   const d = liveData;
 
-  // Derived values
-  const avgDeviation = (
-    d.hex.reduce((s, h, i) => s + Math.abs(h.temp_actual - HEX_SETPOINTS[i]), 0) / 6
-  ).toFixed(2);
-
-  const effClr: Clr =
-    d.output_mashing_efficiency >= 95
-      ? { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" }
-      : d.output_mashing_efficiency >= 88
-      ? { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" }
-      : { stroke: "#dc2626", fill: "#fef2f2", text: "#b91c1c" };
-
-  const wasteClr: Clr =
-    d.output_wastage_pct > 4
-      ? { stroke: "#dc2626", fill: "#fef2f2", text: "#b91c1c" }
-      : d.output_wastage_pct > 1
-      ? { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" }
-      : { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" };
-
   // ── Layout constants ──────────────────────────────────────────────────────
   //
   // Total viewBox: 760 × 490
@@ -281,7 +267,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
   const pipeY  = tankY + TANK_H / 2 + 2; // horizontal flow pipe Y
 
   // Section 1
-  const t1X = 40;
+  const t1X = 28;
   const h1X = [
     t1X + TANK_W + 22,
     t1X + TANK_W + 22 + (HEX_W + HEX_GAP),
@@ -297,6 +283,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
   ];
 
   const finalPipeEnd = h2X[2] + HEX_W + 22;
+  const WATER_FLOW_LABEL = "8,006 kg/h";
 
   return (
     <div style={{
@@ -321,57 +308,16 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         </defs>
 
         <g transform="translate(0, 14)">
-        {/* ── Outer section panel ── */}
-        <rect x={8} y={8} width={744} height={376} rx={14}
-          fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
-
-        {/* ── Header row ── */}
-        <text x={24} y={30} fontSize={11} fill="#0f172a"
-          fontWeight="700" letterSpacing={1} fontFamily="sans-serif">
-          MASHING SECTION
-        </text>
-        <line x1={24} y1={36} x2={736} y2={36} stroke="#e2e8f0" strokeWidth={1} />
-
-        {/* Water flow inline metric */}
-        <text x={24} y={54} fontSize={8.5} fill="#94a3b8"
-          fontFamily="sans-serif" letterSpacing={0.5}>WATER FLOW</text>
-        <text x={24} y={70} fontSize={14} fill="#3b82f6"
-          fontWeight="700" fontFamily="'IBM Plex Mono',monospace">
-          {d.water_flow.toLocaleString()} kg/h
-        </text>
-        <text x={24} y={82} fontSize={7.5} fill="#94a3b8" fontFamily="sans-serif">
-          range {d.water_flow_min.toLocaleString()}–{d.water_flow_max.toLocaleString()}
-        </text>
-
-        {/* Avg temp deviation inline metric (right side) */}
-        <text x={640} y={54} fontSize={8.5} fill="#94a3b8"
-          fontFamily="sans-serif" letterSpacing={0.5}>AVG TEMP DEV</text>
-        <text x={640} y={70} fontSize={14} fill="#0ea5e9"
-          fontWeight="700" fontFamily="'IBM Plex Mono',monospace">
-          {avgDeviation}°C
-        </text>
-
-        {/* ── Process flow white inner panel ── */}
-        <rect x={18} y={90} width={720} height={250} rx={10}
-          fill="#ffffff" stroke="#e2e8f0" strokeWidth={1} />
-        <text x={30} y={100} fontSize={8} fill="#94a3b8"
-          fontFamily="sans-serif" letterSpacing={0.5}>PROCESS FLOW</text>
-
         {/* ═══════════════════════════════════════════
             SECTION 1 — Tank1 → HEX 1,2,3
         ═══════════════════════════════════════════ */}
-
-        {/* Water input label */}
-        <text x={t1X + TANK_W / 2} y={tankY - 42} textAnchor="middle"
-          fontSize={8} fill="#3b82f6" fontFamily="sans-serif">
-          {d.water_flow.toLocaleString()} kg/h
-        </text>
 
         {/* Tank 1 */}
         <MixingTankM
           x={t1X} y={tankY}
           label="SLURRY" level={d.mixing_tank1_level}
-          waterLabel="Water" />
+          waterLabel="Water"
+          waterFlowLabel={WATER_FLOW_LABEL} />
 
         {/* Pipe: Tank1 right → HEX1 left */}
         <line
@@ -398,14 +344,6 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           </g>
         ))}
 
-        {/* Steam input dashed line above HEX2 */}
-        <line
-          x1={h1X[1] + HEX_W / 2} y1={110}
-          x2={h1X[1] + HEX_W / 2} y2={hexY - 14}
-          stroke="#94a3b8" strokeWidth={1.4}
-          strokeDasharray="4 3" markerEnd="url(#arrowGrayMash)" />
-        <text x={h1X[1] + HEX_W / 2 + 4} y={118}
-          fontSize={8} fill="#94a3b8" fontFamily="sans-serif">steam</text>
 
         {/* Pipe: HEX3 right → Tank2 left */}
         <line
@@ -422,7 +360,8 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         <MixingTankM
           x={t2X} y={tankY}
           label="INTERMEDIATE" level={d.mixing_tank2_level}
-          waterLabel="Water" />
+          waterLabel="Water"
+          waterFlowLabel={WATER_FLOW_LABEL} />
 
         {/* Pipe: Tank2 right → HEX4 left */}
         <line
@@ -448,82 +387,17 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           </g>
         ))}
 
-        {/* Water / steam dashed inputs above HEX5, HEX6 */}
-        {[h2X[1], h2X[2]].map((hx, i) => (
-          <g key={i}>
-            <line
-              x1={hx + HEX_W / 2} y1={110}
-              x2={hx + HEX_W / 2} y2={hexY - 14}
-              stroke="#3b82f6" strokeWidth={1.4}
-              strokeDasharray="4 3" markerEnd="url(#arrowMash)" />
-          </g>
-        ))}
-
         {/* Final output pipe */}
         <line
           x1={h2X[2] + HEX_W} y1={pipeY}
           x2={finalPipeEnd}     y2={pipeY}
           stroke="#3b82f6" strokeWidth={2}
           markerEnd="url(#arrowMash)" />
-        <text x={finalPipeEnd + 4} y={pipeY + 4}
-          fontSize={8} fill="#3b82f6" fontFamily="sans-serif">out</text>
+        <text x={762} y={209} textAnchor="end"
+          fontSize={9} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">To Extraction</text>
+        <text x={749} y={219} textAnchor="end"
+          fontSize={9} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">Section</text>
 
-        {/* ── Output strip ── */}
-        <rect x={18} y={400} width={720} height={42} rx={8}
-          fill="#ffffff" stroke="#e2e8f0" strokeWidth={1.2} />
-        {/* blue left accent */}
-        {/* <rect x={18} y={400} width={4} height={36} rx={2} fill="#3b82f6" /> */}
-
-        {/* 4 KPI cells */}
-        {([
-          {
-            label: "MASHING EFFICIENCY",
-            value: d.output_mashing_efficiency.toFixed(1) + "%",
-            sub:   "Target: 95%",
-            c:     effClr,
-          },
-          {
-            label: "AVG TEMP DEVIATION",
-            value: avgDeviation + "°C",
-            sub:   "",
-            c:     { stroke: "#0284c7", fill: "#f0f9ff", text: "#0369a1" } as Clr,
-          },
-          {
-            label: "ACTUAL OUTPUT",
-            value: d.output_actual_kg.toLocaleString() + " kg",
-            sub:   "Std: " + d.output_std_kg.toLocaleString(),
-            c:     { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" } as Clr,
-          },
-          {
-            label: "WASTAGE",
-            value: d.output_wastage_pct.toFixed(2) + "%",
-            sub:   "",
-            c:     wasteClr,
-          },
-        ] as { label: string; value: string; sub: string; c: Clr }[]).map((kpi, i) => {
-          const cellW = 160;
-          const cellX = 22 + i * cellW;
-          const labelY = 414;
-          const valueY = 428;
-          return (
-            <g key={i}>
-              {/* subtle divider between cells */}
-              {i > 0 && (
-                <line x1={cellX} y1={408} x2={cellX} y2={432}
-                  stroke="#e2e8f0" strokeWidth={1} />
-              )}
-              <text x={cellX + 8} y={labelY} fontSize={7.5} fill="#94a3b8"
-                fontFamily="sans-serif" letterSpacing={0.3}>{kpi.label}</text>
-              <text x={cellX + 8} y={valueY} fontSize={12} fontWeight="700"
-                fill={kpi.c.text}
-                fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
-              {kpi.sub && (
-                <text x={cellX + 8} y={valueY + 10} fontSize={7} fill="#94a3b8"
-                  fontFamily="sans-serif">{kpi.sub}</text>
-              )}
-            </g>
-          );
-        })}
         </g>
       </svg>
     </div>

@@ -44,7 +44,8 @@ const mockData: ExtractionData = {
   output_actual_kg:       27650,
   output_std_kg:          28620,
 };
-const TOP_TANK_LABELS = ["WORT2", "WORT1", "WORT"] as const;
+const TOP_TANK_LABELS = ["WORT2 Tank", "WORT1 Tank", "WORT Tank"] as const;
+const WASH_TANK_LABELS = ["Husk Tank", "Wash Tank 2", "Wash Tank 1"] as const;
 const TOP_TANK_IMAGE_HREF = "/images/cylinder.png";
 
 type Clr = { stroke: string; fill: string; text: string };
@@ -242,25 +243,6 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
         {/* ── Section panel ── */}
         <rect x={12} y={65} width={930} height={346} rx={18} fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
 
-        {/* ── Header ── */}
-        <text x={12} y={18} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          EXTRACTION SECTION
-        </text>
-        <line x1={12} y1={24} x2={948} y2={24} stroke="#dbe2ea" strokeWidth={1} />
-
-        {/* ── Header metrics (inline, no cards) ── */}
-        <text x={16} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">PREDICTED</text>
-        <text x={16} y={60} fontSize={13} fill="#ea580c" fontWeight="700">{d.pct_predicted.toFixed(1)}%</text>
-
-        <text x={130} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">MEASURED</text>
-        <text x={130} y={60} fontSize={13} fill="#dc2626" fontWeight="700">{d.pct_measured.toFixed(1)}%</text>
-
-        <text x={720} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">TARGET</text>
-        <text x={720} y={60} fontSize={13} fill="#2563eb" fontWeight="700">{d.target_pct.toFixed(1)}%</text>
-
-        <text x={810} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">% TS</text>
-        <text x={810} y={60} fontSize={13} fill="#2563eb" fontWeight="700">{d.pct_ts.toFixed(1)}</text>
-
         {/* ══════════════════════════════════════════════
             3 MAIN COLUMNS
         ══════════════════════════════════════════════ */}
@@ -329,7 +311,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
               <HopperTank x={wtx} y={wtY} w={74} level={wu.level_pct} neutral />
 
               {/* wash tank inline label */}
-              <text x={wtx + 37} y={wtY + 86} textAnchor="middle" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Wash Tank</text>
+              <text x={wtx + 37} y={wtY + 86} textAnchor="middle" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">{WASH_TANK_LABELS[col]}</text>
               <text x={wtx + 37} y={wtY + 100} textAnchor="middle" fontSize={9} fill="#64748b" fontWeight="700">{wu.level_pct.toFixed(1)}%</text>
 
               {/* ── Cross flow from wash tanks to extractors (bent arrows) ── */}
@@ -383,8 +365,6 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
               {/* ── Wash tank side info (consistent with top tank styling) ── */}
               <text x={wtx + 86} y={wtY + 32} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
               <text x={wtx + 86} y={wtY + 46} fontSize={11} fill="#dc2626" fontWeight="700">{wu.level_pct.toFixed(1)}%</text>
-              <text x={wtx + 86} y={wtY + 60} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
-              <text x={wtx + 86} y={wtY + 74} fontSize={11} fill="#dc2626" fontWeight="700">{wu.bip.toFixed(1)}</text>
 
             </g>
           );

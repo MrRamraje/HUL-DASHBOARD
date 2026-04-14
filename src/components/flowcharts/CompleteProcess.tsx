@@ -196,23 +196,17 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
 
         <rect x={0} y={0} width={1040} height={500} fill="#ffffff" />
 
-        {/* ── Header ── */}
-        <text x={16} y={18} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          COMPLETE PROCESS — HIGH LEVEL OVERVIEW
-        </text>
-        <line x1={16} y1={24} x2={1024} y2={24} stroke="#dbe2ea" strokeWidth={1} />
-
         {/* live dot */}
         <circle cx={1016} cy={16} r={4} fill="#22c55e" />
         <text x={1008} y={19} textAnchor="end" fontSize={8.5} fill="#16a34a" fontWeight="700">LIVE</text>
 
         {/* ══════════════════════════════════════════════
-            LEFT BOX — SOLID HANDLING
+            LEFT BOX — SOLID DISPENSING
         ══════════════════════════════════════════════ */}
         <rect x={12} y={32} width={336} height={316} rx={16}
           fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
         <text x={180} y={50} textAnchor="middle" fontSize={9} fill="#64748b"
-          fontWeight="700" letterSpacing={1}>SOLID HANDLING</text>
+          fontWeight="700" letterSpacing={1}>SOLID DISPENSING</text>
 
         {/* 3 silos */}
         <MiniSilo x={24}  y={58} label="WG" />

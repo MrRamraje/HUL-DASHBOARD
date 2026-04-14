@@ -1,86 +1,100 @@
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type BipInputValues = Record<string, string>;
-export type BipOutputValues = Record<string, string>;
 
-const parseNumber = (value: string): number | null => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
+export interface BipRow {
+  id: string;
+  uom: string;
+  fields: string[];
+  volume?: number;
+  defaultValue?: string;
+  [key: string]: unknown;
+}
 
-const safeDivide = (numerator: number, denominator: number): number | null => {
-  if (denominator === 0) return null;
-  return numerator / denominator;
-};
+// ─── Formula helpers ──────────────────────────────────────────────────────────
 
-const toDisplay = (value: number | null): string => {
-  if (value === null || Number.isNaN(value)) return '-';
-  return value.toFixed(4);
-};
+/**
+ * BIP(for level) = ((Level / 100) * Volume * (% Recovery / 100)) / (SD Factor * BoM Output)
+ *
+ * @param level      - User-entered level % (e.g. 67.0)
+ * @param volume     - Tank volume in Ltrs (e.g. 3000)
+ * @param recovery   - % Recovery for the row (e.g. 27.24)
+ * @param sdFactor   - SD Factor (e.g. 0.65477)
+ * @param bomOutput  - Calculated BoM Output: (WF + MB + WG + ISP) * inputType
+ */
+function calcLevelBip(
+  level: number,
+  volume: number,
+  recovery: number,
+  sdFactor: number,
+  bomOutput: number,
+): number | null {
+  if (sdFactor <= 0 || bomOutput <= 0 || volume <= 0) return null;
+  return ((level / 100) * volume * (recovery / 100)) / (sdFactor * bomOutput);
+}
 
-const computeForRow = (row: any, values: BipInputValues, inputTypeValue: number): string => {
-  let mv = parseNumber(values[`${row.id}-mv`]);
-  const intermediate = parseNumber(values[`${row.id}-intermediate`]);
-  const volume = row.volume;
-  const recovery = row.recovery;
-  const sd = row.sd;
-  const bom = row.bom;
-  const recoveryFactor = row.recoveryFactor;
-  const minutes = parseNumber(values[`${row.id}-minutes`]);
-  const ftq = parseNumber(values[`${row.id}-ftq`]);
+/**
+ * BIP(for time) = (1 / 60) * Time
+ *
+ * @param timeMinutes - User-entered time in minutes (e.g. 64.4)
+ */
+function calcTimeBip(timeMinutes: number): number | null {
+  if (timeMinutes <= 0) return null;
+  return (1 / 60) * timeMinutes;
+}
 
-  // For leg1 and leg2, override mv with calculated value
-  if (row.id === 'leg1' || row.id === 'leg2') {
-    mv = 57 * inputTypeValue;
-  }
+/**
+ * BIP(for quantity) = Qty / BoM Output
+ *
+ * @param qty        - User-entered quantity in kg/hr (e.g. 17013.6)
+ * @param bomOutput  - Calculated BoM Output
+ */
+function calcQtyBip(qty: number, bomOutput: number): number | null {
+  if (bomOutput <= 0) return null;
+  return qty / bomOutput;
+}
 
-  switch (row.id) {
-    case 'leg1': {
-      if (mv === null || volume === null || recovery === null || sd === null || bom === null) return '-';
-      const numerator = (mv / 100) * volume * (recovery / 100);
-      const divided = safeDivide(numerator, sd);
-      return toDisplay(divided !== null ? safeDivide(divided, bom) : null);
-    }
-    case 'leg2': {
-      if (intermediate === null || volume === null || recovery === null || sd === null || bom === null) return '-';
-      const numerator = (intermediate / 100) * volume * (recovery / 100);
-      const divided = safeDivide(numerator, sd);
-      return toDisplay(divided !== null ? safeDivide(divided, bom) : null);
-    }
-    case 'legTime': {
-      if (minutes === null) return '-';
-      return toDisplay(minutes / 60);
-    }
-    case 'mbt': {
-      if (mv === null || volume === null || recovery === null || sd === null || bom === null) return '-';
-      const numerator = (mv / 100) * volume * (recovery / 100);
-      const divided = safeDivide(numerator, sd);
-      return toDisplay(divided !== null ? safeDivide(divided, bom) : null);
-    }
-    case 'maltodextrin':
-    case 'wort':
-    case 'ww1':
-    case 'ww2': {
-      if (recovery === null || volume === null || recoveryFactor === null || sd === null || bom === null) return '-';
-      const numerator = (recovery / 100) * volume * (recoveryFactor / 100);
-      const divided = safeDivide(numerator, sd);
-      return toDisplay(divided !== null ? safeDivide(divided, bom) : null);
-    }
-    case 'wortFTQ': {
-      if (ftq === null || sd === null) return '-';
-      return toDisplay(safeDivide(ftq, sd));
-    }
-    default:
-      return '-';
-  }
-};
+// ─── Main calculator ──────────────────────────────────────────────────────────
 
-export const calculateBipValues = (
-  rows: any[],
+export function calculateBipValues(
+  rows: BipRow[],
   values: BipInputValues,
-  inputTypeValue: number,
-  volumes?: any,
-): BipOutputValues => {
-  return rows.reduce<BipOutputValues>((acc, row) => {
-    acc[row.id] = computeForRow(row, values, inputTypeValue);
-    return acc;
-  }, {});
-};
+  _inputValue: number,          // kept for API compatibility
+  volumes: Record<string, string>,
+  recoveries: Record<string, string>,
+  sdFactor: number,
+  bomOutput: number,
+): Record<string, string> {
+  const results: Record<string, string> = {};
+
+  for (const row of rows) {
+    const fieldKey = `${row.id}-${row.fields[0]}`;
+    const inputNum = Number(values[fieldKey]);
+
+    let bip: number | null = null;
+
+    if (row.uom === 'min') {
+      // ── Time-based: Leg 1 (min), Leg 2 (min) ────────────────────────────────
+      // Formula: (1/60) * Time
+      bip = calcTimeBip(inputNum);
+
+    } else if (row.uom === 'kg/hr') {
+      // ── Quantity-based: Wort FTQ ─────────────────────────────────────────────
+      // Formula: Qty / BoM Output
+      bip = calcQtyBip(inputNum, bomOutput);
+
+    } else {
+      // ── Level-based: all % UOM rows ──────────────────────────────────────────
+      // Formula: ((Level/100) * Volume * (Recovery/100)) / (SD Factor * BoM Output)
+      const volume   = Number(volumes[row.id])    || 0;
+      const recovery = Number(recoveries[row.id]) || 0;
+      bip = calcLevelBip(inputNum, volume, recovery, sdFactor, bomOutput);
+    }
+
+    results[row.id] = (bip !== null && Number.isFinite(bip))
+      ? bip.toFixed(4)
+      : '-';
+  }
+
+  return results;
+}
