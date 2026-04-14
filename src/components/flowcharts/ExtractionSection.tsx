@@ -28,15 +28,15 @@ const mockData: ExtractionData = {
   target_pct:    91.0,
   pct_ts:        14.8,
   columns: [
-    { lt_tag: "LT12_09_03", vessel_name: "WORT2", level_pct: 64, bip: 245.6 },
+    { lt_tag: "LT13_10_03", vessel_name: "WORT2", level_pct: 64, bip: 245.6 },
     { lt_tag: "LT13_08_03", vessel_name: "WORT1", level_pct: 71, bip: 248.3 },
-    { lt_tag: "LT12_09_03", vessel_name: "WORT",  level_pct: 58, bip: 242.1 },
+    { lt_tag: "LT14_11_03", vessel_name: "WORT",  level_pct: 58, bip: 242.1 },
   ],
-  buffer: { lt_tag: "LT14_11_03", vessel_name: "Buffer Tank", level_pct: 74, bip: 230.0 },
+  buffer: { lt_tag: "LT13_11_03", vessel_name: "Buffer Tank", level_pct: 74, bip: 230.0 },
   wash_boxes: [
     { lt_tag: "LT12_09_03", vessel_name: "Wash Tank", level_pct: 44, bip: 210.5 },
-    { lt_tag: "LT12_09_03", vessel_name: "Wash Tank", level_pct: 52, bip: 214.2 },
-    { lt_tag: "LT13_08_03", vessel_name: "Wash Tank", level_pct: 68, bip: 218.7 },
+    { lt_tag: "LT13_06_03", vessel_name: "Wash Tank", level_pct: 52, bip: 214.2 },
+    { lt_tag: "LT13_05_03", vessel_name: "Wash Tank", level_pct: 68, bip: 218.7 },
   ],
   output_wort_brix:       14.8,
   output_wort_extraction: 88.6,
@@ -44,6 +44,8 @@ const mockData: ExtractionData = {
   output_actual_kg:       27650,
   output_std_kg:          28620,
 };
+const TOP_TANK_LABELS = ["WORT2", "WORT1", "WORT"] as const;
+const TOP_TANK_IMAGE_HREF = "/images/cylinder.png";
 
 type Clr = { stroke: string; fill: string; text: string };
 
@@ -58,18 +60,20 @@ const BLUE:   Clr = { stroke: "#3b82f6", fill: "#eff6ff",  text: "#1d4ed8" };
 
 // ─── Vessel ───────────────────────────────────────────────────────────────────
 function Vessel({ x, y, w = 80, label }: { x: number; y: number; w?: number; label: string }) {
-  const h = 48, cx = x + w / 2;
-  const pts = [
-    `${x + 12},${y}`, `${x + w - 12},${y}`,
-    `${x + w},${y + 16}`, `${x + w},${y + h}`,
-    `${x},${y + h}`,  `${x},${y + 16}`,
-  ].join(" ");
+  const h = 48;
   return (
     <g>
-      <polygon points={pts} fill="#f8fafc" stroke="#64748b" strokeWidth={1.4} />
+      <image
+        href={TOP_TANK_IMAGE_HREF}
+        x={x - 14}
+        y={y - 22}
+        width={w + 28}
+        height={h + 42}
+        preserveAspectRatio="xMidYMid meet"
+      />
       {label && (
-        <text x={cx} y={y + h / 2 + 5} textAnchor="middle"
-          fontSize={10} fill="#1e293b" fontWeight="700" fontFamily="sans-serif">{label}</text>
+        <text x={x - 12} y={y + 10} textAnchor="end"
+          fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">{label}</text>
       )}
     </g>
   );
@@ -136,7 +140,7 @@ function HopperTank({
       <polygon
         points={`${x + w * 0.72},${y + topH} ${x + w},${y + topH} ${x + w * 0.72},${y + topH + funnelH}`}
         fill="#e2e8f0" />
-      {[0.28, 0.62].map((cx_r, i) => (
+      {!neutral && [0.28, 0.62].map((cx_r, i) => (
         <g key={i}>
           <circle cx={x + w * cx_r} cy={y + topH + funnelH * 0.68} r={9}
             fill="#f1f5f9" stroke="#64748b" strokeWidth={1} />
@@ -197,7 +201,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
   const centY  = 176;
   const wtY    = 302;
   const wtH    = 74;
-  const bufX   = 756;
+  const bufX   = 716;
   const bufY   = 178;
 
   const extractC = sc(d.pct_measured, d.target_pct, 0.03);
@@ -208,7 +212,13 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
     : { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" };
 
   return (
-    <div style={{ background: "#ffffff", padding: "16px 0 8px", borderRadius: 18 }}>
+    <div style={{
+      background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 20%)",
+      padding: "16px 10px 10px",
+      borderRadius: 18,
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
+    }}>
       <svg width="100%" viewBox="0 0 960 530" fontFamily="'IBM Plex Mono', monospace">
         <defs>
           <marker id="arrowEX" viewBox="0 0 10 10" refX="8" refY="5"
@@ -220,11 +230,17 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
             <path d="M2 2L8 5L2 8" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
           </marker>
         </defs>
+        <style>{`
+          rect {
+            display: grid;
+            position: absolute;
+          }
+        `}</style>
 
         <rect x={0} y={0} width={960} height={530} fill="#ffffff" />
 
         {/* ── Section panel ── */}
-        <rect x={12} y={74} width={930} height={346} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
+        <rect x={12} y={65} width={930} height={346} rx={18} fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
 
         {/* ── Header ── */}
         <text x={12} y={18} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>
@@ -233,16 +249,16 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
         <line x1={12} y1={24} x2={948} y2={24} stroke="#dbe2ea" strokeWidth={1} />
 
         {/* ── Header metrics (inline, no cards) ── */}
-        <text x={16} y={44} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">PREDICTED</text>
+        <text x={16} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">PREDICTED</text>
         <text x={16} y={60} fontSize={13} fill="#ea580c" fontWeight="700">{d.pct_predicted.toFixed(1)}%</text>
 
-        <text x={130} y={44} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">MEASURED</text>
+        <text x={130} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">MEASURED</text>
         <text x={130} y={60} fontSize={13} fill="#dc2626" fontWeight="700">{d.pct_measured.toFixed(1)}%</text>
 
-        <text x={720} y={44} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">TARGET</text>
+        <text x={720} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">TARGET</text>
         <text x={720} y={60} fontSize={13} fill="#2563eb" fontWeight="700">{d.target_pct.toFixed(1)}%</text>
 
-        <text x={810} y={44} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">% TS</text>
+        <text x={810} y={44} fontSize={8.5} fill="#64748b" fontFamily="sans-serif">% TS</text>
         <text x={810} y={60} fontSize={13} fill="#2563eb" fontWeight="700">{d.pct_ts.toFixed(1)}</text>
 
         {/* ══════════════════════════════════════════════
@@ -254,12 +270,13 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           const vx = cx - vesW / 2;
           const ctx = cx - centW / 2;
           const wtx = cx - 37;
+              const washTankLineX = [123, 333, 543][col];
 
           return (
             <g key={col}>
               {/* ── Vessel ── */}
-              {u.vessel_name
-                ? <Vessel x={vx} y={vesY} w={vesW} label={u.vessel_name} />
+              {TOP_TANK_LABELS[col]
+                ? <Vessel x={vx} y={vesY} w={vesW} label={TOP_TANK_LABELS[col]} />
                 : (
                   <polygon
                     points={`${vx + 12},${vesY} ${vx + vesW - 12},${vesY} ${vx + vesW},${vesY + 16} ${vx + vesW},${vesY + 48} ${vx},${vesY + 48} ${vx},${vesY + 16}`}
@@ -267,56 +284,107 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
                 )
               }
 
-              {/* ── Arrow: WORT vessel → down extractor ── */}
+              {/* ── Arrow: extractor → WORT vessel ── */}
               <line
-                x1={cx} y1={vesY + 48}
-                x2={cx} y2={centY}
+                x1={cx} y1={180}
+                x2={cx} y2={156}
                 stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowEX)" />
+              {col === 2 && (
+                <>
+                  <line
+                    x1={cx + 24} y1={vesY + 12}
+                    x2={640} y2={vesY + 12}
+                    stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)"
+                  />
+                  <text
+                    x={648}
+                    y={vesY + 16}
+                    fontSize={8.5}
+                    fill="#475569"
+                    fontFamily="sans-serif"
+                    textAnchor="start"
+                  >
+                    Maltodextrin Tank
+                  </text>
+                </>
+              )}
 
               {/* ── Centrifuge ── */}
               <Centrifuge x={ctx} y={centY} />
 
-              {/* ── Unit info: LT tag, Level%, BIP (near WORT vessel) ── */}
-              <text x={vx + vesW + 8} y={vesY + 12} fontSize={9} fill="#dc2626" fontWeight="700">{u.lt_tag}</text>
-              <text x={vx + vesW + 8} y={vesY + 27} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Level %</text>
-              <text x={vx + vesW + 8} y={vesY + 40} fontSize={11} fill="#dc2626" fontWeight="700">{u.level_pct.toFixed(1)}%</text>
-              <text x={vx + vesW + 8} y={vesY + 54} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">BIP</text>
-              <text x={vx + vesW + 8} y={vesY + 67} fontSize={11} fill="#dc2626" fontWeight="700">{u.bip.toFixed(1)}</text>
+              {/* ── Top vessel info block (aligned left of vessel) ── */}
+              <text x={vx - 12} y={vesY + 24} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
+              <text x={vx - 12} y={vesY + 38} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.level_pct.toFixed(1)}%</text>
+              <text x={vx - 12} y={vesY + 52} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
+              <text x={vx - 12} y={vesY + 66} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.bip.toFixed(1)}</text>
 
               {/* ── Arrow: extractor → wash tank (direct vertical) ── */}
               <line
-                x1={cx} y1={centY + 78}
-                x2={cx} y2={wtY}
-                stroke="#3b82f6" strokeWidth={1.4} markerEnd="url(#arrowEX)" />
+                x1={washTankLineX} y1={254}
+                x2={washTankLineX} y2={302}
+                stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)"
+                style={{ position: "absolute", left: "300px", display: "flex", flexWrap: "wrap" }} />
 
               {/* ── Wash tank ── */}
               <HopperTank x={wtx} y={wtY} w={74} level={wu.level_pct} neutral />
 
               {/* wash tank inline label */}
-              <text x={wtx + 37} y={wtY + 86} textAnchor="middle" fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Wash Tank</text>
+              <text x={wtx + 37} y={wtY + 86} textAnchor="middle" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Wash Tank</text>
               <text x={wtx + 37} y={wtY + 100} textAnchor="middle" fontSize={9} fill="#64748b" fontWeight="700">{wu.level_pct.toFixed(1)}%</text>
 
-              {/* ── Cross flow from wash tanks to extractors (direct arrows) ── */}
+              {/* ── Cross flow from wash tanks to extractors (bent arrows) ── */}
               {(() => {
                 let targetCol: number | null = null;
-                // Cross arrows as per process:
-                // LT12_09_03 (middle wash tank) -> 1st extractor
-                // LT13_08_03 (right wash tank)  -> middle extractor
-                if (wu.lt_tag === "LT12_09_03" && col === 1) targetCol = 0;
-                if (wu.lt_tag === "LT13_08_03" && col === 2) targetCol = 1;
+                // Required routing:
+                // LT13_06_03 wash tank -> 1st extractor
+                // LT13_05_03 wash tank -> middle extractor
+                if (wu.lt_tag === "LT13_06_03" && col === 1) targetCol = 0;
+                if (wu.lt_tag === "LT13_05_03" && col === 2) targetCol = 1;
                 if (targetCol === null) return null;
+
+                const startX = cx;
+                const startY = wtY + 16;
+
+                // Target the side module of centrifuge body for clean visual docking.
+                const targetX = colCX[targetCol] + 27;
+                const targetY = centY + 30;
+                const jogX = targetX + 80;
+                const isFirstRequestedPolyline = wu.lt_tag === "LT13_06_03" && col === 1;
+                const isSecondRequestedPolyline = wu.lt_tag === "LT13_05_03" && col === 2;
+                const isRequestedPolyline = isFirstRequestedPolyline || isSecondRequestedPolyline;
+                const polylinePoints = isFirstRequestedPolyline
+                  ? "300,318 237,318 237,206 177,206"
+                  : isSecondRequestedPolyline
+                  ? "511,318 447,318 447,206 390,206"
+                  : `${startX},${startY} ${jogX},${startY} ${jogX},${targetY} ${targetX},${targetY}`;
+
                 return (
-                  <line
-                    x1={cx} y1={wtY + 16}
-                    x2={colCX[targetCol]} y2={centY + 78}
-                    stroke="#3b82f6" strokeWidth={1.2} markerEnd="url(#arrowEX)" />
+                  <polyline
+                    points={polylinePoints}
+                    style={{
+                      position: "absolute",
+                      display: "grid",
+                      flexFlow: "column",
+                      justifyContent: "flex-start",
+                      alignItems: "flex-start",
+                      gridTemplateColumns: "repeat(11, 1fr)",
+                      gridTemplateRows: "repeat(8, 1fr)",
+                    }}
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth={isRequestedPolyline ? 1.6 : 1.4}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    markerEnd="url(#arrowEX)"
+                  />
                 );
               })()}
 
-              {/* ── Wash tank inline info (side of tank) ── */}
-              <text x={wtx + 86} y={wtY + 18} fontSize={8.5} fill="#dc2626" fontWeight="700">{wu.lt_tag}</text>
-              <text x={wtx + 86} y={wtY + 32} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">Level {wu.level_pct.toFixed(1)}%</text>
-              <text x={wtx + 86} y={wtY + 46} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">BIP {wu.bip.toFixed(1)}</text>
+              {/* ── Wash tank side info (consistent with top tank styling) ── */}
+              <text x={wtx + 86} y={wtY + 32} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
+              <text x={wtx + 86} y={wtY + 46} fontSize={11} fill="#dc2626" fontWeight="700">{wu.level_pct.toFixed(1)}%</text>
+              <text x={wtx + 86} y={wtY + 60} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
+              <text x={wtx + 86} y={wtY + 74} fontSize={11} fill="#dc2626" fontWeight="700">{wu.bip.toFixed(1)}</text>
 
             </g>
           );
@@ -327,15 +395,16 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
         ══════════════════════════════════════════════ */}
         <HopperTank x={bufX} y={bufY} w={80} level={d.buffer.level_pct} />
         {/* Buffer inline info */}
-        <text x={bufX} y={bufY - 12} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Buffer Tank</text>
-        <text x={bufX} y={bufY + 88} fontSize={8.5} fill="#dc2626" fontWeight="700">{d.buffer.lt_tag}</text>
-        <text x={bufX} y={bufY + 102} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">Level {d.buffer.level_pct.toFixed(1)}%</text>
-        <text x={bufX} y={bufY + 116} fontSize={8} fill="#94a3b8" fontFamily="sans-serif">BIP {d.buffer.bip.toFixed(1)}</text>
+        <text x={bufX} y={bufY - 12} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Buffer Tank</text>
+        <text x={bufX} y={bufY + 102} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
+        <text x={bufX} y={bufY + 116} fontSize={11} fill="#dc2626" fontWeight="700">{d.buffer.level_pct.toFixed(1)}%</text>
+        <text x={bufX} y={bufY + 130} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
+        <text x={bufX} y={bufY + 144} fontSize={11} fill="#dc2626" fontWeight="700">{d.buffer.bip.toFixed(1)}</text>
 
         {/* arrow: buffer → rightmost centrifuge */}
         <line
-          x1={bufX}           y1={bufY + 30}
-          x2={colCX[2] + 46}  y2={centY + 28}
+          x1={bufX} y1={208}
+          x2={596} y2={208}
           stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)" />
 
         {/* ══════════════════════════════════════════════
@@ -356,6 +425,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           { label: "TOTAL WASTAGE %",    value: d.output_total_wastage.toFixed(2) + "%",    c: wastageC },
         ] as { label: string; value: string; c: Clr }[]).map((kpi, i) => (
           <g key={i}>
+            {i > 0 && <line x1={30 + i * 232} y1={472} x2={30 + i * 232} y2={512} stroke="#e2e8f0" strokeWidth={1} />}
             <text x={36 + i * 232} y={480} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
             <text x={36 + i * 232} y={504} fontSize={20} fontWeight="700" fill={kpi.c.text}
               fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>

@@ -300,9 +300,11 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
 
   return (
     <div style={{
-      background: "#ffffff",
-      padding: "18px 18px 8px",
-      borderRadius: 12,
+      background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 18%)",
+      padding: "18px 18px 10px",
+      borderRadius: 16,
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
       fontFamily: "'Inter','Segoe UI',sans-serif",
     }}>
       <svg width="100%" viewBox="0 0 760 490"
@@ -321,7 +323,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         <g transform="translate(0, 14)">
         {/* ── Outer section panel ── */}
         <rect x={8} y={8} width={744} height={376} rx={14}
-          fill="#f8fafc" stroke="#e2e8f0" strokeWidth={1.2} />
+          fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
 
         {/* ── Header row ── */}
         <text x={24} y={30} fontSize={11} fill="#0f172a"
@@ -467,7 +469,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           fontSize={8} fill="#3b82f6" fontFamily="sans-serif">out</text>
 
         {/* ── Output strip ── */}
-        <rect x={18} y={400} width={664} height={42} rx={8}
+        <rect x={18} y={400} width={720} height={42} rx={8}
           fill="#ffffff" stroke="#e2e8f0" strokeWidth={1.2} />
         {/* blue left accent */}
         {/* <rect x={18} y={400} width={4} height={36} rx={2} fill="#3b82f6" /> */}

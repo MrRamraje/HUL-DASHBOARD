@@ -174,7 +174,13 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
   const outC = sc(d.total_bip_output, d.std_output);
 
   return (
-    <div style={{ background: "#ffffff", padding: "16px 0 8px", borderRadius: 18 }}>
+    <div style={{
+      background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 18%)",
+      padding: "16px 12px 12px",
+      borderRadius: 18,
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
+    }}>
       <svg width="100%" viewBox="0 0 1040 500"
         fontFamily="'IBM Plex Mono', monospace">
         <defs>
@@ -204,7 +210,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
             LEFT BOX — SOLID HANDLING
         ══════════════════════════════════════════════ */}
         <rect x={12} y={32} width={336} height={316} rx={16}
-          fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.4} />
+          fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
         <text x={180} y={50} textAnchor="middle" fontSize={9} fill="#64748b"
           fontWeight="700" letterSpacing={1}>SOLID HANDLING</text>
 
@@ -276,7 +282,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
             RIGHT BOX — MASHING + MALTED DEXTRON
         ══════════════════════════════════════════════ */}
         <rect x={352} y={32} width={676} height={316} rx={16}
-          fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.4} />
+          fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.4} />
 
         {/* ─ MASHING sub-box — no fill, just a subtle border ─ */}
         <rect x={364} y={44} width={394} height={188} rx={12}
@@ -441,6 +447,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           <g key={i}>
             <rect x={28 + i * 512} y={396} width={494} height={78} rx={10}
               fill={kpi.c.fill} stroke={kpi.c.stroke} strokeWidth={1.3} />
+            {i > 0 && <line x1={28 + i * 512 - 8} y1={396} x2={28 + i * 512 - 8} y2={474} stroke="#e2e8f0" strokeWidth={1} />}
             {/* label */}
             <text x={28 + i * 512 + 247} y={414} textAnchor="middle"
               fontSize={9.5} fill="#6b7280" fontFamily="sans-serif" letterSpacing={0.5}>
@@ -463,7 +470,8 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           background: "#ffffff",
           border: "1px solid #e2e8f0",
           borderRadius: 12,
-          padding: "14px 18px",
+          padding: "16px 18px",
+          boxShadow: "0 4px 14px rgba(15,23,42,0.04)",
         }}>
           <div style={{
             fontSize: 10,

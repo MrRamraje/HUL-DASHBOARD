@@ -186,7 +186,13 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
   const wgCX = 96,  wfCX = 236, mbCX = 376;
 
   return (
-    <div style={{ background: "#ffffff", padding: "16px 0 8px", borderRadius: 18 }}>
+    <div style={{
+      background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 18%)",
+      padding: "16px 12px 12px",
+      borderRadius: 18,
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
+    }}>
       <svg width="100%" viewBox="0 0 1040 600" fontFamily="'IBM Plex Mono', monospace">
         <defs>
           <marker id="arrowSH" viewBox="0 0 10 10" refX="8" refY="5"
@@ -202,15 +208,15 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
         <rect x={0} y={0} width={1040} height={600} fill="#ffffff" />
 
         {/* ── Section panels ── */}
-        <rect x={12} y={40} width={548} height={420} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
-        <rect x={572} y={108} width={456} height={312} rx={18} fill="#f8fafc" stroke="#dbe2ea" strokeWidth={1.2} />
+        <rect x={12} y={40} width={548} height={420} rx={18} fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
+        <rect x={572} y={108} width={456} height={312} rx={18} fill="#f8fafc" stroke="#cfd8e3" strokeWidth={1.2} />
 
         {/* ── Header ── */}
         <text x={12} y={20} fontSize={11} fill="#0f172a" fontWeight="700" letterSpacing={1}>SOLID HANDLING</text>
         <line x1={12} y1={26} x2={1028} y2={26} stroke="#dbe2ea" strokeWidth={1} />
 
-        <text x={28} y={58} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif" letterSpacing={1}>FEED, MILLING & DOSING</text>
-        <text x={590} y={126} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif" letterSpacing={1}>MIXING & CONDITIONING</text>
+        <text x={28} y={58} fontSize={8.5} fill="#64748b" fontFamily="sans-serif" letterSpacing={1}>FEED, MILLING & DOSING</text>
+        <text x={590} y={126} fontSize={8.5} fill="#64748b" fontFamily="sans-serif" letterSpacing={1}>MIXING & CONDITIONING</text>
 
         {/* ════════════════════════════════════════════════
             SILO 1 — WG & ISP
@@ -290,16 +296,17 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
             Center of conveyor: convX + convW/2 = 245
             Panel width: 200, so x = 245 + offset. But mixing tank is at TX=596.
             We position panel to the right of the tank, directly beside it. */}
-        <text x={TX + 115} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
-        <line x1={TX + 115} y1={tankY + 18} x2={TX + 292} y2={tankY + 18} stroke="#dbe2ea" strokeWidth={0.8} />
+        <rect x={TX + 108} y={tankY - 2} width={186} height={92} rx={10} fill="#ffffff" stroke="#dbe2ea" strokeWidth={1} />
+        <text x={TX + 120} y={tankY + 14} fontSize={8.5} fill="#3b82f6" fontWeight="700">Water / Weak wort</text>
+        <line x1={TX + 120} y1={tankY + 18} x2={TX + 282} y2={tankY + 18} stroke="#dbe2ea" strokeWidth={0.8} />
 
         {/* RPM, Current, Level — inline */}
-        <text x={TX + 115} y={tankY + 38} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">RPM</text>
-        <text x={TX + 200} y={tankY + 38} textAnchor="end" fontSize={11} fill="#059669" fontWeight="700">{d.mixing_rpm}</text>
-        <text x={TX + 115} y={tankY + 56} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
-        <text x={TX + 200} y={tankY + 56} textAnchor="end" fontSize={11} fill="#374151" fontWeight="700">{d.mixing_current.toFixed(1)} A</text>
-        <text x={TX + 115} y={tankY + 74} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Tank Level</text>
-        <text x={TX + 200} y={tankY + 74} textAnchor="end" fontSize={11}
+        <text x={TX + 120} y={tankY + 38} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">RPM</text>
+        <text x={TX + 276} y={tankY + 38} textAnchor="end" fontSize={11} fill="#059669" fontWeight="700">{d.mixing_rpm}</text>
+        <text x={TX + 120} y={tankY + 56} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Current</text>
+        <text x={TX + 276} y={tankY + 56} textAnchor="end" fontSize={11} fill="#374151" fontWeight="700">{d.mixing_current.toFixed(1)} A</text>
+        <text x={TX + 120} y={tankY + 74} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">Tank Level</text>
+        <text x={TX + 276} y={tankY + 74} textAnchor="end" fontSize={11}
           fill={d.mixing_tank_level < 50 ? "#dc2626" : "#059669"} fontWeight="700">{d.mixing_tank_level}%</text>
 
         
@@ -320,6 +327,7 @@ const SolidHandling: React.FC<{ data?: SolidHandlingData }> = ({ data = mockData
           { label: "WASTAGE %",          value: d.output_wastage_pct.toFixed(2) + "%", color: waC.text },
         ] as { label: string; value: string; color: string }[]).map((kpi, i) => (
           <g key={i}>
+            {i > 0 && <line x1={30 + i * 254} y1={522} x2={30 + i * 254} y2={578} stroke="#e2e8f0" strokeWidth={1} />}
             <text x={36 + i * 254} y={532} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
             <text x={36 + i * 254} y={562} fontSize={22} fontWeight="700" fill={kpi.color} fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
           </g>
