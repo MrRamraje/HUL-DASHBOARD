@@ -45,7 +45,6 @@ const mockData: ExtractionData = {
   output_actual_kg:       27650,
   output_std_kg:          28620,
 };
-const TOP_TANK_LABELS = ["WORT2 Tank", "WORT1 Tank", "Maltodextrin Tank"] as const;
 const WASH_TANK_LABELS = ["Husk Silo", "Wash Tank 2", "Wash Tank 1"] as const;
 const EXTRACTOR_LABELS = ["Extractor 3", "Extractor 2", "Extractor 1"] as const;
 const TOP_TANK_IMAGE_HREF = "/images/cylinder.png";
@@ -77,6 +76,40 @@ function Vessel({ x, y, w = 80, label }: { x: number; y: number; w?: number; lab
       {label && (
         <text x={x - 12} y={y + 10} textAnchor="end"
           fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">{label}</text>
+      )}
+    </g>
+  );
+}
+
+function ProcessTank({
+  x,
+  y,
+  w = 104,
+  h = 44,
+  labelLines,
+}: {
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  labelLines: [string, string?];
+}) {
+  const cx = x + w / 2;
+  const shadeW = Math.min(14, Math.max(10, w * 0.14));
+
+  return (
+    <g>
+      <ellipse cx={cx} cy={y} rx={w / 2} ry={8} fill="#e2e8f0" stroke="#64748b" strokeWidth={1.2} />
+      <rect x={x} y={y} width={w} height={h} fill="#f8fafc" stroke="#64748b" strokeWidth={1.2} />
+      <rect x={x + w - shadeW} y={y} width={shadeW} height={h} fill="#e2e8f0" />
+      <ellipse cx={cx} cy={y + h} rx={w / 2} ry={8} fill="#f1f5f9" stroke="#64748b" strokeWidth={1.2} />
+      <text x={cx} y={y + h / 2 - 3} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
+        {labelLines[0]}
+      </text>
+      {labelLines[1] && (
+        <text x={cx} y={y + h / 2 + 10} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
+          {labelLines[1]}
+        </text>
       )}
     </g>
   );
@@ -246,6 +279,15 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
   const wtH    = 74;
   const bufX   = 716;
   const bufY   = 178;
+  const weakTankW = 104;
+  const weakTankH = 44;
+  const weakTankX = (colCX[0] + colCX[1]) / 2 - weakTankW / 2;
+  const weakTankY = vesY + 4;
+  const weakTankCenterX = weakTankX + weakTankW / 2;
+  const weakTankMidY = weakTankY + weakTankH / 2;
+  const weakTankLeftPipeX = weakTankX - 8;
+  const weakTankRightPipeX = weakTankX + weakTankW + 8;
+  const extractorOutletY = 180;
 
   const extractC = sc(d.pct_measured, d.target_pct, 0.03);
   const wastageC: Clr = d.output_total_wastage > 4
@@ -296,22 +338,15 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           return (
             <g key={col}>
               {/* ── Vessel ── */}
-              {TOP_TANK_LABELS[col]
-                ? <Vessel x={vx} y={vesY} w={vesW} label={TOP_TANK_LABELS[col]} />
-                : (
-                  <polygon
-                    points={`${vx + 12},${vesY} ${vx + vesW - 12},${vesY} ${vx + vesW},${vesY + 16} ${vx + vesW},${vesY + 48} ${vx},${vesY + 48} ${vx},${vesY + 16}`}
-                    fill="#f8fafc" stroke="#64748b" strokeWidth={1.4} />
-                )
-              }
+              {col === 2 && <Vessel x={vx} y={vesY} w={vesW} label="Maltodextrin Tank" />}
 
               {/* ── Arrow: extractor → WORT vessel ── */}
-              <line
-                x1={cx} y1={180}
-                x2={cx} y2={156}
-                stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowEX)" />
               {col === 2 && (
                 <>
+                  <line
+                    x1={cx} y1={extractorOutletY}
+                    x2={cx} y2={156}
+                    stroke="#3b82f6" strokeWidth={2} markerEnd="url(#arrowEX)" />
                   <line
                     x1={cx + 24} y1={vesY + 12}
                     x2={640} y2={vesY + 12}
@@ -326,7 +361,51 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
                     fontFamily="sans-serif"
                     textAnchor="start"
                   >
-                    WORT Tank
+                    WORT TANK
+                  </text>
+                  <text
+                    x={648}
+                    y={vesY + 30}
+                    fontSize={8.5}
+                    fill="#0f172a"
+                    fontWeight="700"
+                    fontFamily="sans-serif"
+                    textAnchor="start"
+                  >
+                    Level
+                  </text>
+                  <text
+                    x={648}
+                    y={vesY + 43}
+                    fontSize={11}
+                    fill="#dc2626"
+                    fontWeight="700"
+                    fontFamily="'IBM Plex Mono', monospace"
+                    textAnchor="start"
+                  >
+                    {`${d.columns[2].level_pct.toFixed(1)}%`}
+                  </text>
+                  <text
+                    x={648}
+                    y={vesY + 57}
+                    fontSize={8.5}
+                    fill="#0f172a"
+                    fontWeight="700"
+                    fontFamily="sans-serif"
+                    textAnchor="start"
+                  >
+                    BIP
+                  </text>
+                  <text
+                    x={648}
+                    y={vesY + 70}
+                    fontSize={11}
+                    fill="#dc2626"
+                    fontWeight="700"
+                    fontFamily="'IBM Plex Mono', monospace"
+                    textAnchor="start"
+                  >
+                    {d.columns[2].bip.toFixed(1)}
                   </text>
                 </>
               )}
@@ -344,10 +423,14 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
               </text>
 
               {/* ── Top vessel info block (aligned left of vessel) ── */}
-              <text x={vx - 12} y={vesY + 24} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
-              <text x={vx - 12} y={vesY + 38} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.level_pct.toFixed(1)}%</text>
-              <text x={vx - 12} y={vesY + 52} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
-              <text x={vx - 12} y={vesY + 66} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.bip.toFixed(1)}</text>
+              {col === 2 && (
+                <>
+                  <text x={vx - 12} y={vesY + 24} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
+                  <text x={vx - 12} y={vesY + 38} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.level_pct.toFixed(1)}%</text>
+                  <text x={vx - 12} y={vesY + 52} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
+                  <text x={vx - 12} y={vesY + 66} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700">{u.bip.toFixed(1)}</text>
+                </>
+              )}
 
               {/* ── Arrow: extractor → wash tank (direct vertical) ── */}
               <line
@@ -387,9 +470,9 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
                 const isSecondRequestedPolyline = wu.lt_tag === "LT13_05_03" && col === 2;
                 const isRequestedPolyline = isFirstRequestedPolyline || isSecondRequestedPolyline;
                 const polylinePoints = isFirstRequestedPolyline
-                  ? "300,318 237,318 237,206 177,206"
+                  ? "300,360 237,360 237,206 177,206"
                   : isSecondRequestedPolyline
-                  ? "511,318 447,318 447,206 390,206"
+                  ? "511,360 447,360 447,206 390,206"
                   : `${startX},${startY} ${jogX},${startY} ${jogX},${targetY} ${targetX},${targetY}`;
 
                 return (
@@ -427,40 +510,65 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
         })}
 
         {/* ── New merged upward arrow from WORT2 & WORT1 (upper-left) ── */}
-        <line
-          x1={colCX[0]}
-          y1={vesY - 4}
-          x2={colCX[0]}
-          y2={vesY - 28}
-          stroke="#3b82f6"
-          strokeWidth={2}
+        {([
+          {
+            key: "wort2",
+            sourceX: colCX[0],
+            targetX: weakTankLeftPipeX,
+            textX: 122.5,
+            value: "85.6% | BIP 7.60",
+          },
+          {
+            key: "wort1",
+            sourceX: colCX[1],
+            targetX: weakTankRightPipeX,
+            textX: 340,
+            value: "39.0% | BIP 6.30",
+          },
+        ] as const).map(({ key, sourceX, targetX, textX, value }) => {
+          return (
+            <g key={key}>
+              <line
+                x1={sourceX}
+                y1={extractorOutletY}
+                x2={sourceX}
+                y2={weakTankMidY}
+                stroke="#3b82f6"
+                strokeWidth={2}
+              />
+              <line
+                x1={sourceX}
+                y1={weakTankMidY}
+                x2={targetX}
+                y2={weakTankMidY}
+                stroke="#3b82f6"
+                strokeWidth={2}
+                markerEnd="url(#arrowEX)"
+              />
+              <text x={textX} y={104} textAnchor="middle" fontSize={8.5} fill="#dc2626" fontWeight="700" fontFamily="'IBM Plex Mono', monospace">
+                {value}
+              </text>
+            </g>
+          );
+        })}
+
+        <ProcessTank
+          x={weakTankX}
+          y={weakTankY}
+          w={weakTankW}
+          h={weakTankH}
+          labelLines={["Weak Wort", "Tank"]}
         />
         <line
-          x1={colCX[1]}
-          y1={vesY - 4}
-          x2={colCX[1]}
-          y2={vesY - 28}
-          stroke="#3b82f6"
-          strokeWidth={2}
-        />
-        <line
-          x1={colCX[0]}
-          y1={vesY - 28}
-          x2={colCX[1]}
-          y2={vesY - 28}
-          stroke="#3b82f6"
-          strokeWidth={2}
-        />
-        <line
-          x1={(colCX[0] + colCX[1]) / 2}
-          y1={vesY - 28}
-          x2={(colCX[0] + colCX[1]) / 2}
-          y2={vesY - 56}
+          x1={weakTankCenterX}
+          y1={weakTankY - 12}
+          x2={weakTankCenterX}
+          y2={weakTankY - 44}
           stroke="#3b82f6"
           strokeWidth={2}
           markerEnd="url(#arrowEX)"
         />
-        <text x={(colCX[0] + colCX[1]) / 2} y={vesY - 62} textAnchor="middle" fontSize={9} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
+        <text x={weakTankCenterX} y={weakTankY - 52} textAnchor="middle" fontSize={9} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
           To Slurry Tank
         </text>
 
@@ -504,20 +612,19 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.4} />
         <rect x={12} y={440} width={5} height={78} rx={3} fill="#3b82f6" />
         <text x={28} y={458} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          TAB OUTPUT
+          OUTPUT SUMMARY
         </text>
         <line x1={28} y1={464} x2={938} y2={464} stroke="#dbe2ea" strokeWidth={1} />
 
         {([
-          { label: "WORT % BRIX",        value: d.output_wort_brix.toFixed(1) + "%",       c: BLUE },
-          { label: "WORT EXTRACTION %",  value: d.output_wort_extraction.toFixed(1) + "%", c: extractC },
-          { label: "ACTUAL OUTPUT (kg)", value: d.output_actual_kg.toLocaleString(),        c: sc(d.output_actual_kg, d.output_std_kg) },
-          { label: "TOTAL WASTAGE %",    value: d.output_total_wastage.toFixed(2) + "%",    c: wastageC },
+          { label: "TOTAL BIP",  value: "9.9",                           c: BLUE },
+          { label: "TS%",        value: "85%",                           c: BLUE },
+          { label: "WASTAGE %",  value: d.output_total_wastage.toFixed(2) + "%", c: wastageC },
         ] as { label: string; value: string; c: Clr }[]).map((kpi, i) => (
           <g key={i}>
-            {i > 0 && <line x1={30 + i * 232} y1={472} x2={30 + i * 232} y2={512} stroke="#e2e8f0" strokeWidth={1} />}
-            <text x={36 + i * 232} y={480} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
-            <text x={36 + i * 232} y={504} fontSize={20} fontWeight="700" fill={kpi.c.text}
+            {i > 0 && <line x1={30 + i * 303} y1={472} x2={30 + i * 303} y2={512} stroke="#e2e8f0" strokeWidth={1} />}
+            <text x={36 + i * 303} y={480} fontSize={8.5} fill="#94a3b8" fontFamily="sans-serif">{kpi.label}</text>
+            <text x={36 + i * 303} y={504} fontSize={20} fontWeight="700" fill={kpi.c.text}
               fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
           </g>
         ))}

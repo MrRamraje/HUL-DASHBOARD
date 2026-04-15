@@ -94,8 +94,24 @@ function MiniHex({ x, y, temp, actual }: { x: number; y: number; temp: number; a
       <rect x={x + 3} y={y + 4} width={W - 6} height={H - 8} rx={4}
         fill="none" stroke={c} strokeWidth={0.9} />
       {/* flow lines top */}
-      <line x1={x + 10} y1={y - 7} x2={x + 10} y2={y} stroke="#94a3b8" strokeWidth={1} />
-      <line x1={x + 22} y1={y} x2={x + 22} y2={y - 7} stroke="#94a3b8" strokeWidth={1} />
+      <line
+        x1={x + 10}
+        y1={y - 9}
+        x2={x + 10}
+        y2={y}
+        stroke="#94a3b8"
+        strokeWidth={1}
+        markerEnd="url(#arrowGCP)"
+      />
+      <line
+        x1={x + 22}
+        y1={y}
+        x2={x + 22}
+        y2={y - 9}
+        stroke="#94a3b8"
+        strokeWidth={1}
+        markerEnd="url(#arrowGCP)"
+      />
       <text x={x + 16} y={y + H + 12} textAnchor="middle" fontSize={8}
         fill={c} fontWeight="700" fontFamily="'IBM Plex Mono',monospace">{actual.toFixed(0)}°</text>
     </g>
@@ -127,8 +143,9 @@ function MiniBufferTank({ x, y }: { x: number; y: number }) {
       <polygon
         points={`${x + 44},${y} ${x + 52},${y} ${x + 44},${y + 52}`}
         fill="#e2e8f0" />
-      <text x={x + 26} y={y + 23} textAnchor="middle" fontSize={7.5} fill="#64748b">Buffer</text>
-      <text x={x + 26} y={y + 35} textAnchor="middle" fontSize={7.5} fill="#64748b">Tank</text>
+      <text x={x + 26} y={y + 14} textAnchor="middle" fontSize={6.5} fill="#64748b">Mash</text>
+      <text x={x + 26} y={y + 24} textAnchor="middle" fontSize={6.5} fill="#64748b">Buffer</text>
+      <text x={x + 26} y={y + 34} textAnchor="middle" fontSize={6.5} fill="#64748b">Tank</text>
       <circle cx={x + 14} cy={y + 43} r={5} fill="#f1f5f9" stroke="#94a3b8" strokeWidth={0.8} />
       <circle cx={x + 38} cy={y + 43} r={5} fill="#f1f5f9" stroke="#94a3b8" strokeWidth={0.8} />
     </g>
@@ -193,15 +210,32 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
     return () => { if (ivRef.current) clearInterval(ivRef.current); };
   }, []);
 
-  const waC: Clr = d.wastage_deviation > 4
-    ? { stroke: "#dc2626", fill: "#fef2f2", text: "#b91c1c" }
-    : d.wastage_deviation > 1
-    ? { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" }
-    : { stroke: "#16a34a", fill: "#f0fdf4", text: "#15803d" };
-
-  const outC = sc(d.total_bip_output, d.std_output);
   const MASH_Y_OFFSET = 16;
   const RIGHT_SECTION_SHIFT = 36;
+  const SECTION_LABEL_COLOR = "#2563eb";
+  const SECTION_LABEL_SIZE = 12;
+  const SECTION_LABEL_SPACING = 1.6;
+  const MILL_X = 252;
+  const MILL_Y = 158;
+  const MB_VALUE_X = 304;
+  const HEX_AFTER_IV_START_X = 760;
+  const HEX_AFTER_IV_SPACING = 48;
+  const BUFFER_LEVEL_Y = 334;
+  const EXTRACTOR_TANK_Y = 232;
+  const EXTRACTOR_TANK_H = 22;
+  const EXTRACTOR_NAME_Y = 223;
+  const EXTRACTOR_VALUE_Y = 247;
+  const EXTRACTOR_BODY_Y = 292;
+  const EXTRACTOR_WASTE_LINE_Y = 330;
+  const EXTRACTOR_FUNNEL_TOP_Y = 366;
+  const EXTRACTOR_FUNNEL_BOTTOM_Y = 406;
+  const EXTRACTOR_BOTTOM_LABEL_Y = 422;
+  const EXTRACTION_SECTION_Y = 452;
+  const WEAK_WORT_BOX_X = 441;
+  const WEAK_WORT_BOX_W = 40;
+  const WEAK_WORT_BOX_CENTER_X = WEAK_WORT_BOX_X + WEAK_WORT_BOX_W / 2;
+  const WEAK_WORT_LINE_BEND_Y = 272;
+  const TO_SLURRY_Y = 206;
 
   return (
     <div style={{
@@ -211,7 +245,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
       border: "1px solid #e2e8f0",
       boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
     }}>
-      <svg width="100%" viewBox="0 0 1040 650"
+      <svg width="100%" viewBox="0 0 1040 490"
         fontFamily="'IBM Plex Mono', monospace">
         <defs>
           <marker id="arrowCP" viewBox="0 0 10 10" refX="8" refY="5"
@@ -224,7 +258,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           </marker>
         </defs>
 
-        <rect x={0} y={0} width={1040} height={650} fill="#ffffff" />
+        <rect x={0} y={0} width={1040} height={490} fill="#ffffff" />
 
         {/* live dot */}
         <circle cx={1016} cy={16} r={4} fill="#22c55e" />
@@ -234,8 +268,8 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
             LEFT BOX — SOLID DISPENSING
         ══════════════════════════════════════════════ */}
 
-        <text x={180} y={50} textAnchor="middle" fontSize={9} fill="#64748b"
-          fontWeight="700" letterSpacing={1}>SOLID DISPENSING</text>
+        <text x={180} y={38} textAnchor="middle" fontSize={SECTION_LABEL_SIZE} fill={SECTION_LABEL_COLOR}
+          fontWeight="700" letterSpacing={SECTION_LABEL_SPACING}>SOLID DISPENSING</text>
 
         {/* 3 silos */}
         <MiniSilo x={24}  y={58} label="WG" />
@@ -249,25 +283,30 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           { cx: 278, v: d.mb_flow, t: 1200 },
         ].map(({ cx, v, t }, i) => {
           const c = sc(v, t);
+          const isMillFlow = i === 2;
+          const valueX = isMillFlow ? MB_VALUE_X : cx - 10;
+          const textAnchor = isMillFlow ? "start" : "end";
+          const valueY = isMillFlow ? 140 : 134;
+          const unitY = isMillFlow ? 151 : 145;
           return (
             <g key={i}>
-              <text x={cx} y={136} textAnchor="middle" fontSize={9}
+              <text x={valueX} y={valueY} textAnchor={textAnchor} fontSize={9}
                 fill={c.text} fontWeight="700" fontFamily="'IBM Plex Mono',monospace">
                 {v.toLocaleString()}
               </text>
-              <text x={cx} y={147} textAnchor="middle" fontSize={7} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
+              <text x={valueX} y={unitY} textAnchor={textAnchor} fontSize={7} fill="#94a3b8" fontFamily="sans-serif">kg/h</text>
             </g>
           );
         })}
 
         {/* pipes down from silos */}
-        <line x1={44}  y1={122} x2={44}  y2={264} stroke="#94a3b8" strokeWidth={2.5} />
-        <line x1={154} y1={122} x2={154} y2={264} stroke="#94a3b8" strokeWidth={2.5} />
+        <line x1={44}  y1={122} x2={44}  y2={264} stroke="#94a3b8" strokeWidth={2.5} markerEnd="url(#arrowGCP)" />
+        <line x1={154} y1={122} x2={154} y2={264} stroke="#94a3b8" strokeWidth={2.5} markerEnd="url(#arrowGCP)" />
         
         {/* mill on MB path */}
-        <line x1={274} y1={122} x2={274} y2={136} stroke="#94a3b8" strokeWidth={2.5} />
-        <line x1={274} y1={178} x2={274} y2={264} stroke="#94a3b8" strokeWidth={2.5} />
-        <MiniMill x={252} y={136} gap={0.44} current={14.0} />
+        <line x1={274} y1={122} x2={274} y2={MILL_Y} stroke="#94a3b8" strokeWidth={2.5} markerEnd="url(#arrowGCP)" />
+        <line x1={274} y1={MILL_Y + 42} x2={274} y2={264} stroke="#94a3b8" strokeWidth={2.5} markerEnd="url(#arrowGCP)" />
+        <MiniMill x={MILL_X} y={MILL_Y} gap={0.44} current={14.0} />
 
         {/* merge funnel */}
         <polygon points="120,244 200,244 188,264 132,264"
@@ -289,7 +328,7 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
 
         {/* pipe right to mashing (zig zag to left side of mix tank inlet) */}
         <polyline
-          points={`298,273 ${298 + (366 + RIGHT_SECTION_SHIFT - 298) / 2},273 ${298 + (366 + RIGHT_SECTION_SHIFT - 298) / 2},${99 + MASH_Y_OFFSET} ${366 + RIGHT_SECTION_SHIFT},${99 + MASH_Y_OFFSET}`}
+          points="298,273 350,273 350,115 402,115"
           fill="none"
           stroke="#3b82f6"
           strokeWidth={2}
@@ -304,8 +343,8 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
 
 
         <g transform={`translate(${RIGHT_SECTION_SHIFT}, 0)`}>
-          <text x={561} y={60} textAnchor="middle" fontSize={8.5} fill="#3b82f6"
-            fontWeight="700" letterSpacing={1}>MASHING SECTION</text>
+          <text x={561} y={42} textAnchor="middle" fontSize={SECTION_LABEL_SIZE} fill={SECTION_LABEL_COLOR}
+            fontWeight="700" letterSpacing={SECTION_LABEL_SPACING}>MASHING SECTION</text>
 
         {/* water input arrows */}
         <line x1={384} y1={44 + MASH_Y_OFFSET} x2={384} y2={72 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
@@ -315,8 +354,8 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         <MiniMixTank x={366} y={72 + MASH_Y_OFFSET} level={d.mixing1_level} lines={["SLURRY", "TANK"]} />
 
         {/* pipe: tank1 → HEX row 1 with expanded gap for labels */}
-        <line x1={422} y1={99 + MASH_Y_OFFSET} x2={504} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
-        <text x={462} y={90 + MASH_Y_OFFSET} textAnchor="middle" fontSize={10} fill="#15803d" fontWeight="700">{d.conveyor_flow.toLocaleString()} kg/h</text>
+        <line x1={436} y1={115} x2={504} y2={115} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <text x={469} y={106} textAnchor="middle" fontSize={10} fill="#15803d" fontWeight="700">9,363 kg/h</text>
 
         {/* HEX row 1: 60°, 64°, 74° */}
         {[0,1,2].map(i => (
@@ -330,40 +369,61 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
         ))}
 
         {/* pipe → mixing tank 2 */}
-        <line x1={630} y1={99 + MASH_Y_OFFSET} x2={668} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={615} y1={115} x2={666} y2={115} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* Mixing Tank 2 */}
         <MiniMixTank x={666} y={72 + MASH_Y_OFFSET} level={d.mixing2_level} lines={["IV", "TANK"]} />
 
         {/* pipe: tank2 → HEX row 2 */}
-        <line x1={722} y1={99 + MASH_Y_OFFSET} x2={742} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
+        <line x1={722} y1={99 + MASH_Y_OFFSET} x2={HEX_AFTER_IV_START_X} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* HEX row 2: 74°, 74°, 80° */}
         {[3,4,5].map(i => (
           <g key={i}>
-            <MiniHex x={742 + (i-3)*42} y={72 + MASH_Y_OFFSET} temp={[74,74,80][i-3]} actual={d.hex_temps[i]} />
+            <MiniHex x={HEX_AFTER_IV_START_X + (i-3)*HEX_AFTER_IV_SPACING} y={72 + MASH_Y_OFFSET} temp={[74,74,80][i-3]} actual={d.hex_temps[i]} />
             {i < 5 && (
-              <line x1={774 + (i-3)*42} y1={99 + MASH_Y_OFFSET} x2={784 + (i-3)*42} y2={99 + MASH_Y_OFFSET}
+              <line
+                x1={HEX_AFTER_IV_START_X + (i-3)*HEX_AFTER_IV_SPACING + 32}
+                y1={99 + MASH_Y_OFFSET}
+                x2={HEX_AFTER_IV_START_X + (i-2)*HEX_AFTER_IV_SPACING}
+                y2={99 + MASH_Y_OFFSET}
                 stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
             )}
           </g>
         ))}
 
         {/* pipe → Buffer tank routing */}
-        <line x1={868} y1={99 + MASH_Y_OFFSET} x2={932} y2={99 + MASH_Y_OFFSET} stroke="#3b82f6" strokeWidth={1.8} />
+        <line
+          x1={HEX_AFTER_IV_START_X + 2 * HEX_AFTER_IV_SPACING + 32}
+          y1={99 + MASH_Y_OFFSET}
+          x2={932}
+          y2={99 + MASH_Y_OFFSET}
+          stroke="#3b82f6"
+          strokeWidth={1.8}
+          markerEnd="url(#arrowCP)"
+        />
         <line x1={932} y1={99 + MASH_Y_OFFSET} x2={932} y2={256} stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowCP)" />
 
         {/* Buffer Tank */}
         <MiniBufferTank x={906} y={258} />
-        <text x={932} y={322} textAnchor="middle" fontSize={7.5}
+        <text x={932} y={BUFFER_LEVEL_Y} textAnchor="middle" fontSize={7.5}
           fill={d.buffer_level < 40 ? "#d97706" : "#16a34a"} fontWeight="700"
           fontFamily="'IBM Plex Mono',monospace">{d.buffer_level}%</text>
 
+        <rect x={WEAK_WORT_BOX_X} y={EXTRACTOR_TANK_Y} width={WEAK_WORT_BOX_W} height={EXTRACTOR_TANK_H} rx={3}
+          fill="#f8fafc" stroke="#94a3b8" strokeWidth={1} />
+        <text x={WEAK_WORT_BOX_CENTER_X} y={EXTRACTOR_VALUE_Y} textAnchor="middle"
+          fontSize={6.5} fill="#475569" fontFamily="sans-serif" fontWeight="700">Weak Wort</text>
+        <line x1={WEAK_WORT_BOX_CENTER_X} y1={EXTRACTOR_TANK_Y} x2={WEAK_WORT_BOX_CENTER_X} y2={TO_SLURRY_Y}
+          stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
+        <text x={WEAK_WORT_BOX_CENTER_X} y={TO_SLURRY_Y - 10} textAnchor="middle"
+          fontSize={8} fill="#3b82f6" fontFamily="sans-serif" fontWeight="700">To Slurry Tank</text>
+
         {/* 3 centrifuge columns */}
         {[
-          { cx: 380, label: "WW2",  pct: d.ww2_pct  },
-          { cx: 498, label: "WW1",  pct: d.ww1_pct  },
-          { cx: 616, label: "Wort", pct: d.wort_pct },
+          { cx: 380, label: "Weak Wort", pct: d.ww2_pct, tankLabel: "Husk Tank" },
+          { cx: 498, label: "Weak Wort", pct: d.ww1_pct, tankLabel: "Wash Tank 2" },
+          { cx: 616, label: "DEXTRON", pct: d.wort_pct, tankLabel: "Wash Tank 1" },
         ].map((unit, i) => {
           const ok = Math.abs(unit.pct - 88) < 5;
           const tc: Clr = ok
@@ -371,71 +431,100 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
             : { stroke: "#d97706", fill: "#fffbeb", text: "#b45309" };
           return (
             <g key={i}>
-              {/* output vessel */}
-              <rect x={unit.cx + 2} y={254} width={40} height={22} rx={3}
-                fill="#f8fafc" stroke="#94a3b8" strokeWidth={1} />
-              <text x={unit.cx + 22} y={263} textAnchor="middle"
-                fontSize={7} fill="#64748b" fontFamily="sans-serif">{unit.label}</text>
-              <text x={unit.cx + 22} y={273} textAnchor="middle"
-                fontSize={7.5} fill={tc.text} fontWeight="700"
-                fontFamily="'IBM Plex Mono',monospace">{unit.pct.toFixed(1)}%</text>
+              {i === 2 && (
+                <>
+                  <text x={unit.cx + 22} y={EXTRACTOR_NAME_Y} textAnchor="middle"
+                    fontSize={8.5} fill="#475569" fontFamily="sans-serif" fontWeight="700">{unit.label}</text>
+                  {/* output vessel */}
+                  <rect x={unit.cx + 2} y={EXTRACTOR_TANK_Y} width={40} height={EXTRACTOR_TANK_H} rx={3}
+                    fill="#f8fafc" stroke="#94a3b8" strokeWidth={1} />
+                  <text x={unit.cx + 22} y={EXTRACTOR_VALUE_Y} textAnchor="middle"
+                    fontSize={7.5} fill={tc.text} fontWeight="700"
+                    fontFamily="'IBM Plex Mono',monospace">{unit.pct.toFixed(1)}%</text>
+                </>
+              )}
               {i === 2 && (
                 <>
                   <line
                     x1={unit.cx + 44}
-                    y1={265}
+                    y1={EXTRACTOR_TANK_Y + 11}
                     x2={unit.cx + 66}
-                    y2={265}
+                    y2={EXTRACTOR_TANK_Y + 11}
                     stroke="#3b82f6"
                     strokeWidth={1.6}
                     markerEnd="url(#arrowCP)"
                   />
                   <text
                     x={unit.cx + 70}
-                    y={268}
+                    y={EXTRACTOR_TANK_Y + 14}
                     textAnchor="start"
                     fontSize={8.5}
                     fill="#7c3aed"
                     fontWeight="700"
                     letterSpacing={1}
                   >
-                    MALTED DEXTRON SYSTEM
+                    WORT TANK
                   </text>
                 </>
               )}
 
               {/* centrifuge */}
-              <MiniCentrifuge x={unit.cx} y={286} />
+              <MiniCentrifuge x={unit.cx} y={EXTRACTOR_BODY_Y} />
 
               {/* up arrow → vessel */}
-              <line x1={unit.cx + 22} y1={286}
-                x2={unit.cx + 22} y2={276}
-                stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
+              {i < 2 ? (
+                <polyline
+                  points={
+                    i === 0
+                      ? `${unit.cx + 22},${EXTRACTOR_BODY_Y} ${unit.cx + 22},${WEAK_WORT_LINE_BEND_Y} ${WEAK_WORT_BOX_X},${WEAK_WORT_LINE_BEND_Y} ${WEAK_WORT_BOX_X},${EXTRACTOR_TANK_Y + EXTRACTOR_TANK_H}`
+                      : `${unit.cx + 22},${EXTRACTOR_BODY_Y} ${unit.cx + 22},${WEAK_WORT_LINE_BEND_Y} ${WEAK_WORT_BOX_X + WEAK_WORT_BOX_W},${WEAK_WORT_LINE_BEND_Y} ${WEAK_WORT_BOX_X + WEAK_WORT_BOX_W},${EXTRACTOR_TANK_Y + EXTRACTOR_TANK_H}`
+                  }
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth={1.5}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  markerEnd="url(#arrowCP)"
+                />
+              ) : (
+                <line x1={unit.cx + 22} y1={EXTRACTOR_BODY_Y}
+                  x2={unit.cx + 22} y2={EXTRACTOR_TANK_Y + EXTRACTOR_TANK_H}
+                  stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
+              )}
+              {i < 2 && (
+                <text x={unit.cx + 22} y={274} textAnchor="middle"
+                  fontSize={7.5} fill={tc.text} fontWeight="700"
+                  fontFamily="'IBM Plex Mono',monospace">{unit.pct.toFixed(1)}%</text>
+              )}
 
               {/* Flow backwards from funnel into previous centrifuge with zig-zag routing */}
               {i > 0 && (
                 <polyline
-                  points={`${unit.cx + 12},400 ${unit.cx - 31},400 ${unit.cx - 31},308 ${unit.cx - 74},308`}
+                  points={`${unit.cx + 12},${EXTRACTOR_FUNNEL_BOTTOM_Y} ${unit.cx - 31},${EXTRACTOR_FUNNEL_BOTTOM_Y} ${unit.cx - 31},${EXTRACTOR_BODY_Y + 22} ${unit.cx - 74},${EXTRACTOR_BODY_Y + 22}`}
                   fill="none"
                   stroke="#3b82f6"
                   strokeWidth={1.5}
+                  markerEnd="url(#arrowCP)"
                 />
               )}
 
               {/* waste funnel below */}
-              <line x1={unit.cx + 22} y1={324}
-                x2={unit.cx + 22} y2={360}
-                stroke="#94a3b8" strokeWidth={2} />
+              <line x1={unit.cx + 22} y1={EXTRACTOR_WASTE_LINE_Y}
+                x2={unit.cx + 22} y2={EXTRACTOR_FUNNEL_TOP_Y}
+                stroke="#94a3b8" strokeWidth={2} markerEnd="url(#arrowGCP)" />
               <polygon
-                points={`${unit.cx},360 ${unit.cx + 44},360 ${unit.cx + 28},400 ${unit.cx + 16},400`}
+                points={`${unit.cx},${EXTRACTOR_FUNNEL_TOP_Y} ${unit.cx + 44},${EXTRACTOR_FUNNEL_TOP_Y} ${unit.cx + 28},${EXTRACTOR_FUNNEL_BOTTOM_Y} ${unit.cx + 16},${EXTRACTOR_FUNNEL_BOTTOM_Y}`}
                 fill="#f1f5f9" stroke="#94a3b8" strokeWidth={0.8} />
-              <text x={unit.cx + 22} y={415} textAnchor="middle"
+              <text x={unit.cx + 22} y={EXTRACTOR_BOTTOM_LABEL_Y} textAnchor="middle"
                 fontSize={8} fill="#94a3b8" fontFamily="sans-serif" fontWeight="700">
-                {i === 0 ? "Husk Tank" : "Wash Tank"}
+                {unit.tankLabel}
               </text>
             </g>
           );
         })}
+
+        <text x={520} y={EXTRACTION_SECTION_Y} textAnchor="middle" fontSize={SECTION_LABEL_SIZE} fill={SECTION_LABEL_COLOR}
+          fontWeight="700" letterSpacing={SECTION_LABEL_SPACING}>EXTRACTION SECTION</text>
 
         {/* pump circle */}
         <circle cx={783} cy={308} r={10}
@@ -444,55 +533,10 @@ const CompleteProcess: React.FC<{ data?: CompleteProcessData }> = ({ data = mock
           fill="#3b82f6" fontWeight="700">P</text>
 
           {/* pipe: buffer → pump */}
-          <polyline points="906,284 850,284 850,308 793,308" stroke="#3b82f6" strokeWidth={1.5} fill="none" />
-          <line x1={660} y1={308} x2={773} y2={308} stroke="#3b82f6" strokeWidth={1.5} />
+          <polyline points="906,284 850,284 850,308 793,308" stroke="#3b82f6" strokeWidth={1.5} fill="none" markerEnd="url(#arrowCP)" />
+          <line x1={773} y1={308} x2={660} y2={308} stroke="#3b82f6" strokeWidth={1.5} markerEnd="url(#arrowCP)" />
         </g>
 
-        {/* ══════════════════════════════════════════════
-            OUTPUT KPI STRIP — Fixed layout, no overflow
-        ══════════════════════════════════════════════ */}
-        <rect x={12} y={494} width={1016} height={120} rx={12}
-          fill="#ffffff" stroke="#dbe2ea" strokeWidth={1.4} />
-        <rect x={12} y={494} width={5} height={120} rx={3} fill="#3b82f6" />
-
-        <text x={28} y={512} fontSize={10} fill="#0f172a" fontWeight="700" letterSpacing={1}>
-          PROCESS SUMMARY 
-        </text>
-        <line x1={28} y1={518} x2={1024} y2={518} stroke="#dbe2ea" strokeWidth={1} />
-
-        {/* KPI cards — 2 cards, proper sizing to prevent overflow */}
-        {([
-          {
-            label: "TOTAL BIP OUTPUT",
-            value: d.total_bip_output.toLocaleString() + " kg",
-            sub:   "Std: " + d.std_output.toLocaleString() + " kg",
-            c:     outC,
-          },
-          {
-            label: "TOTAL WASTAGE",
-            value: d.total_wastage.toLocaleString() + " kg",
-            sub:   d.wastage_deviation.toFixed(2) + "% deviation",
-            c:     waC,
-          },
-        ] as { label: string; value: string; sub: string; c: Clr }[]).map((kpi, i) => (
-          <g key={i}>
-            <rect x={28 + i * 512} y={526} width={494} height={78} rx={10}
-              fill={kpi.c.fill} stroke={kpi.c.stroke} strokeWidth={1.3} />
-            {i > 0 && <line x1={28 + i * 512 - 8} y1={526} x2={28 + i * 512 - 8} y2={604} stroke="#e2e8f0" strokeWidth={1} />}
-            {/* label */}
-            <text x={28 + i * 512 + 247} y={544} textAnchor="middle"
-              fontSize={9.5} fill="#6b7280" fontFamily="sans-serif" letterSpacing={0.5}>
-              {kpi.label}
-            </text>
-            {/* value — centered, large */}
-            <text x={28 + i * 512 + 247} y={577} textAnchor="middle"
-              fontSize={22} fontWeight="700" fill={kpi.c.text}
-              fontFamily="'IBM Plex Mono',monospace">{kpi.value}</text>
-            {/* sub — fits inside card */}
-            <text x={28 + i * 512 + 247} y={596} textAnchor="middle"
-              fontSize={9} fill="#94a3b8" fontFamily="sans-serif">{kpi.sub}</text>
-          </g>
-        ))}
       </svg>
     </div>
   );
