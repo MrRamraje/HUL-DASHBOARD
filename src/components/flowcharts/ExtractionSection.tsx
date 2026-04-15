@@ -5,6 +5,7 @@ interface ExtractionUnit {
   vessel_name: string;
   level_pct: number;
   bip: number;
+  current_a?: number;
 }
 
 interface ExtractionData {
@@ -28,15 +29,15 @@ const mockData: ExtractionData = {
   target_pct:    91.0,
   pct_ts:        14.8,
   columns: [
-    { lt_tag: "LT13_10_03", vessel_name: "WORT2", level_pct: 64, bip: 245.6 },
-    { lt_tag: "LT13_08_03", vessel_name: "WORT1", level_pct: 71, bip: 248.3 },
-    { lt_tag: "LT14_11_03", vessel_name: "WORT",  level_pct: 58, bip: 242.1 },
+    { lt_tag: "LT13_10_03", vessel_name: "WORT2", level_pct: 64, bip: 0.01, current_a: 11.2 },
+    { lt_tag: "LT13_08_03", vessel_name: "WORT1", level_pct: 55, bip: 0.02, current_a: 12.4 },
+    { lt_tag: "LT14_11_03", vessel_name: "WORT",  level_pct: 65, bip: 0.5, current_a: 13.1 },
   ],
   buffer: { lt_tag: "LT13_11_03", vessel_name: "Buffer Tank", level_pct: 74, bip: 230.0 },
   wash_boxes: [
-    { lt_tag: "LT12_09_03", vessel_name: "Wash Tank", level_pct: 44, bip: 210.5 },
-    { lt_tag: "LT13_06_03", vessel_name: "Wash Tank", level_pct: 52, bip: 214.2 },
-    { lt_tag: "LT13_05_03", vessel_name: "Wash Tank", level_pct: 68, bip: 218.7 },
+    { lt_tag: "LT12_09_03", vessel_name: "Wash Tank", level_pct: 38, bip: 210.5 },
+    { lt_tag: "LT13_06_03", vessel_name: "Wash Tank", level_pct: 32, bip: 214.2 },
+    { lt_tag: "LT13_05_03", vessel_name: "Wash Tank", level_pct: 35, bip: 218.7 },
   ],
   output_wort_brix:       14.8,
   output_wort_extraction: 88.6,
@@ -44,7 +45,7 @@ const mockData: ExtractionData = {
   output_actual_kg:       27650,
   output_std_kg:          28620,
 };
-const TOP_TANK_LABELS = ["WORT2 Tank", "WORT1 Tank", "WORT Tank"] as const;
+const TOP_TANK_LABELS = ["WORT2 Tank", "WORT1 Tank", "Maltodextrin Tank"] as const;
 const WASH_TANK_LABELS = ["Husk Silo", "Wash Tank 2", "Wash Tank 1"] as const;
 const EXTRACTOR_LABELS = ["Extractor 3", "Extractor 2", "Extractor 1"] as const;
 const TOP_TANK_IMAGE_HREF = "/images/cylinder.png";
@@ -212,6 +213,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           ...u,
           level_pct: parseFloat((u.level_pct + (Math.random() - 0.5) * 6).toFixed(1)),
           bip:       parseFloat((u.bip       + (Math.random() - 0.5) * 4).toFixed(1)),
+          current_a: Math.max(11, Math.min(13.5, parseFloat((((u.current_a ?? 12) + (Math.random() - 0.5) * 0.4)).toFixed(1)))),
         })),
         buffer: {
           ...prev.buffer,
@@ -324,7 +326,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
                     fontFamily="sans-serif"
                     textAnchor="start"
                   >
-                    Maltodextrin Tank
+                    WORT Tank
                   </text>
                 </>
               )}
@@ -333,6 +335,12 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
               <Centrifuge x={ctx} y={centY} />
               <text x={cx} y={centY + 72} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">
                 {EXTRACTOR_LABELS[col]}
+              </text>
+              <text x={ctx - 5} y={centY + 28} textAnchor="end" fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">
+                Current
+              </text>
+              <text x={ctx - 5} y={centY + 44} textAnchor="end" fontSize={11} fill="#dc2626" fontWeight="700" fontFamily="'IBM Plex Mono', monospace">
+                {(u.current_a ?? 12).toFixed(1)} A
               </text>
 
               {/* ── Top vessel info block (aligned left of vessel) ── */}
@@ -461,7 +469,7 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
         ══════════════════════════════════════════════ */}
         <HopperTank x={bufX} y={bufY} w={80} level={d.buffer.level_pct} />
         {/* Buffer inline info */}
-        <text x={bufX + 40} y={bufY + 100} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">Buffer Tank</text>
+        <text x={bufX + 40} y={bufY + 100} textAnchor="middle" fontSize={9.5} fill="#0f172a" fontWeight="800" fontFamily="sans-serif">Mash Buffer Tank</text>
         <text x={bufX} y={bufY + 118} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">Level</text>
         <text x={bufX} y={bufY + 132} fontSize={11} fill="#dc2626" fontWeight="700">{d.buffer.level_pct.toFixed(1)}%</text>
         <text x={bufX} y={bufY + 146} fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="sans-serif">BIP</text>
@@ -472,6 +480,22 @@ const ExtractionSection: React.FC<{ data?: ExtractionData }> = ({ data = mockDat
           x1={bufX} y1={208}
           x2={596} y2={208}
           stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)" />
+        {/* arrow: mashing section → buffer tank (right to left) */}
+        <line
+          x1={940} y1={198}
+          x2={bufX + 92} y2={198}
+          stroke="#3b82f6" strokeWidth={1.8} markerEnd="url(#arrowEX)" />
+        <text
+          x={884}
+          y={190}
+          textAnchor="middle"
+          fontSize={9}
+          fill="#0f172a"
+          fontWeight="700"
+          fontFamily="sans-serif"
+        >
+          From Mashing Section
+        </text>
 
         {/* ══════════════════════════════════════════════
             OUTPUT STRIP

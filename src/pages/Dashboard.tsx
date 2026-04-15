@@ -31,6 +31,8 @@ ChartJS.register(
 
 const Dashboard: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [mashingHour, setMashingHour] = useState('10');
+  const [presentOutput, setPresentOutput] = useState('7');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -187,6 +189,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             </Card>
+
           </div>
 
           {/* Center Column - Output Metrics */}
@@ -203,37 +206,61 @@ const Dashboard: React.FC = () => {
 
             {/* Gauge Chart */}
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Wastage Analysis</h3>
-            <Card title="Wastage Percentage" className="bg-white/80 backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="relative h-32">
-                    <Doughnut data={gaugeData} options={gaugeOptions} />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-2xl font-bold text-slate-900 font-mono">
-                        {wastagePercentage}%
-                      </div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        Current Wastage
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <Card title="Production Inputs" className="bg-white/80 backdrop-blur-sm">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700">Mashing Hour</span>
+                    <input
+                      type="number"
+                      value={mashingHour}
+                      onChange={(e) => setMashingHour(e.target.value)}
+                      className="w-20 rounded-md border border-slate-300 bg-white px-2 py-1 text-right text-base font-bold text-blue-600 font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700">Present BIP</span>
+                    <input
+                      type="number"
+                      value={presentOutput}
+                      onChange={(e) => setPresentOutput(e.target.value)}
+                      className="w-20 rounded-md border border-slate-300 bg-white px-2 py-1 text-right text-base font-bold text-green-600 font-mono focus:outline-none focus:ring-2 focus:ring-green-400"
+                    />
+                  </div>
+                </div>
+              </Card>
+              <Card title="Wastage Percentage" className="bg-white/80 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="relative h-32">
+                      <Doughnut data={gaugeData} options={gaugeOptions} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div className="text-2xl font-bold text-slate-900 font-mono">
+                          {wastagePercentage}%
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          Current Wastage
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <div className="ml-6 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-sm text-slate-600">Good (&lt;1%)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                      <span className="text-sm text-slate-600">Warning (1-4%)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span className="text-sm text-slate-600">High (&gt;4%)</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="ml-6 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-slate-600">Good (&lt;1%)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                    <span className="text-sm text-slate-600">Warning (1-4%)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span className="text-sm text-slate-600">High (&gt;4%)</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
         </div>
 

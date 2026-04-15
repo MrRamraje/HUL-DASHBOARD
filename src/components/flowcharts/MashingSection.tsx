@@ -14,6 +14,10 @@ interface MashingData {
   water_flow_max: number;
   mixing_tank1_level: number;
   mixing_tank2_level: number;
+  mixing_tank1_bip: number;
+  mixing_tank2_bip: number;
+  post_hex3_bip: number;
+  post_hex6_bip: number;
   hex: HeatExchanger[];
   output_mashing_efficiency: number;
   output_temp_profile: number[];
@@ -28,6 +32,10 @@ const mockData: MashingData = {
   water_flow_max: 8700,
   mixing_tank1_level: 72,
   mixing_tank2_level: 65,
+  mixing_tank1_bip: 246.2,
+  mixing_tank2_bip: 244.8,
+  post_hex3_bip: 243.5,
+  post_hex6_bip: 242.9,
   hex: [
     { temp_setpoint: 60, temp_actual: 59.8, flow_in: 8200, flow_out: 8200 },
     { temp_setpoint: 64, temp_actual: 64.2, flow_in: 8200, flow_out: 8200 },
@@ -58,9 +66,9 @@ function tempClr(actual: number, setpoint: number): Clr {
 // ─── Mixing Tank ──────────────────────────────────────────────────────────────
 // W=80  H=100  inlet arrow above, level bar on right, legs below
 function MixingTankM({
-  x, y, label, level, waterLabel, waterFlowLabel,
+  x, y, label, level, bipValue, waterLabel, waterFlowLabel,
 }: {
-  x: number; y: number; label: string; level: number; waterLabel?: string; waterFlowLabel?: string;
+  x: number; y: number; label: string; level: number; bipValue?: number; waterLabel?: string; waterFlowLabel?: string;
 }) {
   const W = 80, H = 100;
   const cx = x + W / 2;
@@ -122,6 +130,16 @@ function MixingTankM({
       <text x={cx} y={y + H + 36} textAnchor="middle"
         fontSize={9.5} fill={lc} fontWeight="700"
         fontFamily="'IBM Plex Mono',monospace">{level}%</text>
+      {typeof bipValue === "number" && (
+        <>
+          <text x={cx} y={y + H + 50} textAnchor="middle"
+            fontSize={8.5} fill="#0f172a" fontWeight="700"
+            fontFamily="'Inter','Segoe UI',sans-serif">BIP</text>
+          <text x={cx} y={y + H + 63} textAnchor="middle"
+            fontSize={10} fill="#dc2626" fontWeight="700"
+            fontFamily="'IBM Plex Mono',monospace">{bipValue.toFixed(1)}</text>
+        </>
+      )}
 
       {/* legs */}
       {[14, cx - x, W - 14].map((lx, i) => (
@@ -225,6 +243,10 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         ),
         mixing_tank1_level: Math.round(55 + Math.random() * 30),
         mixing_tank2_level: Math.round(50 + Math.random() * 30),
+        mixing_tank1_bip: parseFloat((0.29 + Math.random() * 0.8).toFixed(1)),
+        mixing_tank2_bip: parseFloat((0.23 + Math.random() * 0.8).toFixed(1)),
+        post_hex3_bip: 1.07,
+        post_hex6_bip: 1.07,
         hex: prev.hex.map(h => ({
           ...h,
           temp_actual: parseFloat(
@@ -246,7 +268,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
 
   // ── Layout constants ──────────────────────────────────────────────────────
   //
-  // Total viewBox: 760 × 490
+  // Total viewBox: 760 × 395 (tightened so output / lower labels need less page scroll)
   //
   // Process panel:  x=18  y=92  w=720  h=270
   // Tanks:  W=80  H=100
@@ -261,7 +283,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
   const HEX_W  = 56,  HEX_H  = 92;
   const HEX_GAP = 18;                // gap between consecutive HEXes
 
-  const FLOW_OFFSET_Y = 18;
+  const FLOW_OFFSET_Y = 6;
   const tankY  = 140 + FLOW_OFFSET_Y;               // top of both tanks
   const hexY   = 134 + FLOW_OFFSET_Y;               // top of HEX bodies (slightly above tank centre)
   const pipeY  = tankY + TANK_H / 2 + 2; // horizontal flow pipe Y
@@ -288,13 +310,13 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
   return (
     <div style={{
       background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 18%)",
-      padding: "18px 18px 10px",
+      padding: "12px 18px 6px",
       borderRadius: 16,
       border: "1px solid #e2e8f0",
       boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
       fontFamily: "'Inter','Segoe UI',sans-serif",
     }}>
-      <svg width="100%" viewBox="0 0 760 490"
+      <svg width="100%" viewBox="0 0 760 395"
         style={{ display: "block", overflow: "visible" }}>
         <defs>
           <marker id="arrowMash" viewBox="0 0 10 10" refX="8" refY="5"
@@ -307,7 +329,7 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           </marker>
         </defs>
 
-        <g transform="translate(0, 14)">
+        <g transform="translate(0, -28)">
         {/* ═══════════════════════════════════════════
             SECTION 1 — Tank1 → HEX 1,2,3
         ═══════════════════════════════════════════ */}
@@ -316,8 +338,24 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         <MixingTankM
           x={t1X} y={tankY}
           label="SLURRY" level={d.mixing_tank1_level}
+          bipValue={d.mixing_tank1_bip}
           waterLabel="Water"
           waterFlowLabel={WATER_FLOW_LABEL} />
+
+        {/* Inlet from Solid Dispensing */}
+        <line
+          x1={t1X - 92} y1={pipeY}
+          x2={t1X}      y2={pipeY}
+          stroke="#3b82f6" strokeWidth={2}
+          markerEnd="url(#arrowMash)" />
+          <text x={t1X - 25} y={pipeY - 20} textAnchor="middle"
+          fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">
+          From Solid
+        </text>
+        <text x={t1X - 25} y={pipeY - 8} textAnchor="middle"
+          fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">
+          Dispensing
+        </text>
 
         {/* Pipe: Tank1 right → HEX1 left */}
         <line
@@ -351,6 +389,10 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           x2={t2X}              y2={pipeY}
           stroke="#3b82f6" strokeWidth={2}
           markerEnd="url(#arrowMash)" />
+        <text x={h1X[2] + HEX_W + 20} y={pipeY + 18} textAnchor="middle"
+          fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">BIP</text>
+        <text x={h1X[2] + HEX_W + 20} y={pipeY + 31} textAnchor="middle"
+          fontSize={10} fill="#dc2626" fontWeight="700" fontFamily="'IBM Plex Mono',monospace">{d.post_hex3_bip}</text>
 
         {/* ═══════════════════════════════════════════
             SECTION 2 — Tank2 → HEX 4,5,6
@@ -360,8 +402,10 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
         <MixingTankM
           x={t2X} y={tankY}
           label="INTERMEDIATE" level={d.mixing_tank2_level}
-          waterLabel="Water"
-          waterFlowLabel={WATER_FLOW_LABEL} />
+          bipValue={d.mixing_tank2_bip}
+          // waterLabel="Water"
+          // waterFlowLabel={WATER_FLOW_LABEL}
+           />
 
         {/* Pipe: Tank2 right → HEX4 left */}
         <line
@@ -393,10 +437,14 @@ const MashingSection: React.FC<{ data?: MashingData }> = ({ data = mockData }) =
           x2={finalPipeEnd}     y2={pipeY}
           stroke="#3b82f6" strokeWidth={2}
           markerEnd="url(#arrowMash)" />
-        <text x={762} y={209} textAnchor="end"
+        <text x={762} y={198} textAnchor="end"
           fontSize={9} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">To Extraction</text>
-        <text x={749} y={219} textAnchor="end"
+        <text x={749} y={208} textAnchor="end"
           fontSize={9} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">Section</text>
+        <text x={749} y={223} textAnchor="end"
+          fontSize={8.5} fill="#0f172a" fontWeight="700" fontFamily="'Inter','Segoe UI',sans-serif">BIP</text>
+        <text x={749} y={236} textAnchor="end"
+          fontSize={10} fill="#dc2626" fontWeight="700" fontFamily="'IBM Plex Mono',monospace">{d.post_hex6_bip.toFixed(1)}</text>
 
         </g>
       </svg>

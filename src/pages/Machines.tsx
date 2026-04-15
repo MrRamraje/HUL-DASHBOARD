@@ -68,7 +68,7 @@ const Machines: React.FC = () => {
       {activeTab === 'main' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { label: 'Total BIP Output',    value: '27,650 kg', sub: 'Standard: 28,620 kg' },
+            { label: 'Total BIP Output',    value: '9.8kg', sub: 'Standard: 28,620 kg' },
             { label: 'Mashing Efficiency',  value: '94.2%',     sub: 'Target: 95%',       good: true  },
             { label: 'Wort Extraction %',   value: '88.6%',     sub: 'Target: 91%',       warn: true  },
             { label: 'Total Wastage',        value: '970 kg',    sub: '3.39% deviation',   bad: true   },

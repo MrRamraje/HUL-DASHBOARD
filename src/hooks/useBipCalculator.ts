@@ -54,6 +54,10 @@ function calcQtyBip(qty: number, bomOutput: number): number | null {
   return qty / bomOutput;
 }
 
+function clampSpecificBip(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
 // ─── Main calculator ──────────────────────────────────────────────────────────
 
 export function calculateBipValues(
@@ -92,7 +96,7 @@ export function calculateBipValues(
     }
 
     results[row.id] = (bip !== null && Number.isFinite(bip))
-      ? bip.toFixed(4)
+      ? clampSpecificBip(bip).toFixed(4)
       : '-';
   }
 

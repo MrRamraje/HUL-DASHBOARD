@@ -6,15 +6,15 @@ export const mockBatchInfo = {
   husk: '11.2%',
   grist: '75%',
   powder: '12.5%',
-  standardOutput: 28620,
+  standardOutput: 28620.30,
   actualOutput: 27650,
   wastage: 3.39,
   predictedOutput: 27840,
-  totalBIP: 245.67,
+  totalBIP: 9.09,
 };
 
 export const mockKPIs = [
-  { label: 'Total BIP', value: 245.67, unit: '', change: 'Current Batch' },
+  { label: 'Total BIP', value: 9.09, unit: '', change: 'Current Batch' },
   { label: 'Standard Output', value: 28620, unit: 'kg', change: 'BOM Target' },
   { label: 'Actual Output', value: 27650, unit: 'kg', change: '▼ 3.39% Below Target', warn: true },
   { label: 'Wastage %', value: 3.39, unit: '%', change: 'Above Target', warn: true },
