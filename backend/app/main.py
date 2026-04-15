@@ -7,13 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # -------------------------------
 # Load ML Model (.pkl)
 # -------------------------------
-import os
-import pickle
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "model.pkl")
-
-model = pickle.load(open(MODEL_PATH, "rb")) # 👈 put your .pkl here
+model = pickle.load(open("model.pkl", "rb"))  # 👈 put your .pkl here
 
 # -------------------------------
 # FastAPI App
@@ -71,7 +65,7 @@ def predict(data: PredictionInput):
             data.Husk,
             data.Grist
         ]])
-
+        
         # Model prediction
         prediction = model.predict(input_data)
 
